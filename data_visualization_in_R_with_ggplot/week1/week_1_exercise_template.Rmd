@@ -87,7 +87,7 @@ Hints:
 
 ####PUT YOUR CODE HERE
 ggplot(data = cel_filtered2, aes(y = les, x = majority))+geom_boxplot()+
-  labs(y="Legislative Effectiveness")+
+  labs(y="Legislative Effectiveness", x="Majority or Minority")+
   ggtitle("LES in the 115th Congress")
 
 ```
