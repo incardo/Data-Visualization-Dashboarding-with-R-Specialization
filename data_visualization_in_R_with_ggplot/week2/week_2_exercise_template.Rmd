@@ -14,7 +14,7 @@ cces <- drop_na(read_csv(url("https://www.dropbox.com/s/ahmt12y39unicd2/cces_sam
 
 Your objective is to replicate these figures, created using the Cooperative Congressional Election Study data. These figures are similar to those we completed in the lecture videos.
 
-### Put your name here:
+### Put your name here: Rocco Incardona
 
 
 
@@ -36,6 +36,15 @@ Hints:
 ```{r exercise1,echo=FALSE}
 ####PUT YOUR CODE HERE
 
+cces_filtered <- cces %>% mutate(ideo5 = recode(ideo5,`1`="Very Liberal",`2`="Liberal",
+                                                `3`="Moderate",`4`="Conservative",`5`="Very Conservative"))
+
+
+ggplot(data = cces_filtered, aes(x = ideo5, fill=ideo5))+  geom_bar()+
+  labs(y="Count", x="Ideology")+
+  ggtitle("Respondent Ideology")+
+  guides(fill="none")
+
 ```
 
 ## Exercise 2
@@ -54,6 +63,15 @@ Hints:
 
 ```{r exercise2,echo=FALSE}
 ####PUT YOUR CODE HERE
+
+cces_filtered2 <- cces_filtered %>% mutate(pew_religimp = recode(pew_religimp,`1`="Very imp.",`2`="Somewhat imp.",
+                                                `3`="Not too imp.",`4`="Not imp.")) %>% rename(Ideology = ideo5)
+
+
+ggplot(data = cces_filtered2, aes(x = pew_religimp, fill=Ideology))+  geom_bar()+
+  labs(y="Count", x="Importance of Religion")+
+  ggtitle("Importance of Religion by Ideology")
+
 ```
 
 ## Exercise 3
@@ -73,4 +91,17 @@ The figure should look approximately like this (your vaules will be slightly dif
 
 ```{r exercise3,echo=FALSE}
 ####PUT YOUR CODE HERE
+
+semester <- rep(seq(from=1,to=6,by=1), 3)
+grade <- runif(18,min = 80, max = 100)
+student <- c(rep("Amanda", 6), rep("Betty", 6),rep("Carol", 6))
+fig_data <-tibble("Semester"=semester,"Student"=student, "Grade"=grade)
+
+
+ggplot(fig_data,(aes(x=Semester,y=Grade, group = Student, color = Student)))+ 
+  geom_line() +
+  facet_wrap(~Student) +
+  labs(y="Grade", x="Semester")+
+  ggtitle("Student Grades by Semester")+
+  theme(legend.position = "none")
 ```
