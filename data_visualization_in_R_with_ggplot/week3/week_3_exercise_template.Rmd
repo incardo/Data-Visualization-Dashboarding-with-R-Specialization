@@ -1,0 +1,107 @@
+---
+title: "Week 3 Peer Review"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+
+######DO NOT MODIFY. This will load required packages and data.
+
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+
+cces <- drop_na(read_csv(url("https://www.dropbox.com/s/ahmt12y39unicd2/cces_sample_coursera.csv?raw=1")))
+
+cel <- drop_na(read_csv(url("https://www.dropbox.com/s/4ebgnkdhhxo5rac/cel_volden_wiseman%20_coursera.csv?raw=1")))
+
+```
+
+Following the directions on the Coursera assignment page, you will make four original visualizations. Note that the data for the CCES and CEL data are imported in code in the R Markdown file.
+
+### Requirements
+Using ggplot, create a scatter plot, a distribution figure (box plot, histogram, or density plot), bar plot, and line plot.
+Use colors and facetting in at least one of your figures.
+Add a text annotation to at least one of the your figures.
+Use a ggtheme for one of your figures.
+Make sure your figures have titles and appropriately labeled axes.
+
+### Put your name here: Rocco Incardona
+
+## Exercise 1
+
+Explain what you are visualizing here: Scatter plot
+
+Put your figure here:
+
+```{r exercise1,echo=FALSE}
+
+####PUT YOUR CODE HERE
+
+
+cel_filtered <- cel %>% filter(congress == 115) %>% mutate(Gender = recode(female,`1`="Female",`0`="Male"))
+
+ggplot(data = cel_filtered, aes(x = dwnom1, y = all_pass, color = Gender))+geom_point()+labs(x = "Ideology", y="Bills Passed")
+
+```
+
+## Exercise 2
+
+Explain what you are visualizing here: Distribution figure - histogram 
+
+Put your figure here:
+
+```{r exercise2,echo=FALSE}
+
+####PUT YOUR CODE HERE
+
+c + geom_histogram(binwidth = 5)
+x, y, alpha, color, fill, linetype, size, weight
+  
+```
+
+## Exercise 3
+
+Explain what you are visualizing here: Bar plot
+
+Put your figure here:
+
+```{r exercise3,echo=FALSE}
+
+####PUT YOUR CODE HERE
+
+cces_filtered <- cces %>% mutate(ideo5 = recode(ideo5,`1`="Very Liberal",`2`="Liberal",
+                                                `3`="Moderate",`4`="Conservative",`5`="Very Conservative"))
+
+
+ggplot(data = cces_filtered, aes(x = ideo5, fill=ideo5))+  geom_bar()+
+  labs(y="Count", x="Ideology")+
+  ggtitle("Respondent Ideology")+
+  guides(fill="none")
+
+
+```
+
+## Exercise 4
+
+Explain what you are visualizing here: Line plot
+
+Put your figure here:
+
+```{r exercise4,echo=FALSE}
+
+####PUT YOUR CODE HERE
+
+semester <- rep(seq(from=1,to=6,by=1), 3)
+grade <- runif(18,min = 80, max = 100)
+student <- c(rep("Amanda", 6), rep("Betty", 6),rep("Carol", 6))
+fig_data <-tibble("Semester"=semester,"Student"=student, "Grade"=grade)
+
+
+ggplot(fig_data,(aes(x=Semester,y=Grade, group = Student, color = Student)))+ 
+  geom_line() +
+  facet_wrap(~Student) +
+  labs(y="Grade", x="Semester")+
+  ggtitle("Student Grades by Semester")+
+  theme(legend.position = "none")
+
+```
