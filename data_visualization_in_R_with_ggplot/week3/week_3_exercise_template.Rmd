@@ -29,7 +29,10 @@ Make sure your figures have titles and appropriately labeled axes.
 
 ## Exercise 1
 
-Explain what you are visualizing here: Scatter plot
+Explain what you are visualizing here: 
+Ideology vs percentage of votes won in the 115th LES.Democratic members of the congress are less
+conservative and they also managed to win elections with larger shares of votes.
+Manual colors are set for this figure.
 
 Put your figure here:
 
@@ -37,10 +40,13 @@ Put your figure here:
 
 ####PUT YOUR CODE HERE
 
+cel_filtered <- cel %>% filter(congress == 115) %>% mutate(Party = recode(dem,`1`="Democrat",`0`="Republican"))
 
-cel_filtered <- cel %>% filter(congress == 115) %>% mutate(Gender = recode(female,`1`="Female",`0`="Male"))
+ggplot(data = cel_filtered, aes(x = meddist, y = votepct, color = Party))+geom_point()+
+  labs(x = "Distance from median ideology", y="% of votes won in the election") +  
+  scale_colour_manual(values = c("red", "blue")) +
+  ggtitle("Ideology vs percentage of votes won in the 115th LES")
 
-ggplot(data = cel_filtered, aes(x = dwnom1, y = all_pass, color = Gender))+geom_point()+labs(x = "Ideology", y="Bills Passed")
 
 ```
 
@@ -54,8 +60,23 @@ Put your figure here:
 
 ####PUT YOUR CODE HERE
 
-c + geom_histogram(binwidth = 5)
-x, y, alpha, color, fill, linetype, size, weight
+ces
+
+
+ggplot(data = cel_filtered2, aes(x = votepct, y = all_pass, color = Gender))+geom_point()+
+  labs(x = "Vote Percentage", y="Bills Passed")+facet_grid(cols = vars(majority))+
+  scale_colour_manual(values = c("orange", "green"))
+
+cces %>% mutate(Gender = recode(gender,`1`="Male",`2`="Female")) %>%
+  mutate(Region = recode(region,`1`="Northwest",`2`="Midwest",`3`="South",`4`="West")) %>% 
+  mutate(Region = recode(educ,`1`="Northwest",`2`="Midwest",`3`="South",`4`="West",`5`="South",`6`="West")) %>% 
+  
+  
+  
+  ggplot(aes(faminc_new, fill = Gender)) + geom_histogram(binwidth = 0.5) + 
+  facet_grid(cols = vars(Region))
+
+
   
 ```
 
