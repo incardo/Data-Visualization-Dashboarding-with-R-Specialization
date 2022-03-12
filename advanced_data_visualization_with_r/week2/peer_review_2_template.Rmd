@@ -2,7 +2,7 @@
 title: "Spatial Figures Peer Review"
 output: html_document
 ---
-# PUT YOUR NAME HERE
+# PUT YOUR NAME HERE: Rocco Incardona
 
 ## Problem 1
 
@@ -38,6 +38,13 @@ some_data_values <- data.frame(
 ####HINT: make sure you use left_join to combine the data_values above to the world map data in my_world_map
 
 ####PUT YOUR CODE HERE
+
+map_data_combined <- left_join(my_world_map,some_data_values,by="region")
+
+ggplot(data = map_data_combined, mapping = aes(x= long, y= lat, group = group,fill=Score))+geom_polygon(color="black")+
+  scale_fill_distiller(palette=5)
+
+
 ```
 
 ## Problem 2
@@ -66,6 +73,21 @@ Measurement<-rnorm(32,50,1)
 ####Hint: set the colors for the city points with scale_color_distiller(palette=7)
 
 ####Hint: set the size of all points to the value 5
+
+world <- map_data("world")
+
+mexico <- filter(world,region %in% c("Costa Rica", "Panama", "Nicaragua"))
+
+my_cities <-maps::world.cities
+big_cities <- filter(my_cities,country.etc %in% c("Costa Rica", "Panama", "Nicaragua") & pop>40000) %>%
+              add_column(Measurement)
+
+ggplot(data = mexico, mapping = aes(x= long, y= lat, group = group))+
+  geom_polygon(color="black",fill="white")+
+  geom_point(data = big_cities,aes(x=long,y=lat,group=NULL,color=Measurement,size=5))+
+  scale_color_distiller(palette=7)+
+  guides(size = FALSE)
+
 
 
 ```
@@ -99,6 +121,7 @@ s_america<-ne_countries(scale="medium",continent='south america',returnclass="sf
 
 ####PUT YOUR CODE HERE
 
+ggplot(s_america)+geom_sf(aes(fill=pop_est))+scale_fill_distiller(palette=10)
 ```
 
 
