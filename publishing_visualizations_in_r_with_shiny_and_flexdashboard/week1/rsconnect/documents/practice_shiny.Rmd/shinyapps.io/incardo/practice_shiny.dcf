@@ -1,0 +1,13 @@
+name: practice_shiny
+title: practice_shiny
+username:
+account: incardo
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 5870540
+bundleId: 5693221
+url: https://incardo.shinyapps.io/practice_shiny/
+when: 1647468690.65709
+lastSyncTime: 1647468690.65709
+asMultiple: FALSE
+asStatic: FALSE

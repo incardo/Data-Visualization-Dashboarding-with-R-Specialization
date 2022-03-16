@@ -1,0 +1,14 @@
+name: test_app
+title: test_app
+username:
+account: incardo
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 5870470
+bundleId: 5693200
+url: https://incardo.shinyapps.io/test_app/
+when: 1647468165.43144
+lastSyncTime: 1647468165.43144
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: cel_codebook.txt|cel_volden_wiseman_coursera.csv|congress_example.R|myown_shiny.R|old_faithful_example.R
