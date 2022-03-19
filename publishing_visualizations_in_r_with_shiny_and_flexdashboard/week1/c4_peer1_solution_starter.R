@@ -38,18 +38,12 @@ ui<-fluidPage(
       # generate bins based on input$bins from ui.R
       #x    <- dat %>% filter(ideo5==input$ideology)  %>% select(pid7)
       plot_data <- dat %>% filter(ideo5==input$ideology)
-      x    <- plot_data$pid7
       
-      bins <- seq(0, 8, length.out = 9)
-      
-      # draw the histogram with the specified number of bins
-      #hist(x, breaks = bins, col = 'darkgray', border = 'white')
-      ggplot(plot_data, aes(x=pid7)) + geom_histogram(col = "grey", bins = 9)+
-      scale_x_continuous(limits = c(0, 8))
-      
-      
-      # draw the histogram with the specified number of bins
-      #hist(x, breaks = bins, col = 'darkgray', border = 'white')
+      ggplot(plot_data, aes(x=pid7)) + geom_bar(stat = "count", col = "grey")+
+      scale_x_continuous(limits = c(0, 8))+
+      scale_y_continuous(breaks = seq(0, 125, by = 25), limits = c(0, 125))+
+      labs(y="Count", x = "7 Point Party ID, 1=Very D, 7=Very R")
+        
       
     })
   }
