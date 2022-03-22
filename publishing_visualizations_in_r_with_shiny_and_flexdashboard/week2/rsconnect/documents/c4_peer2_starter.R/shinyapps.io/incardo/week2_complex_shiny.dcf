@@ -1,0 +1,14 @@
+name: week2_complex_shiny
+title: week2_complex_shiny
+username:
+account: incardo
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 5912294
+bundleId: 5715053
+url: https://incardo.shinyapps.io/week2_complex_shiny/
+when: 1647986547.34579
+lastSyncTime: 1647986547.34579
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: cces_sample_codebook.txt|cces_sample_coursera.csv|inputs_outputs_examples.R|navlists.R|pages.R|rows_columns.R|tabsets.R
