@@ -1,0 +1,127 @@
+---
+title: "Peer Review Three"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(tidyverse)
+library(plotly)
+library(shiny)
+
+dat<-read_csv(url("https://www.dropbox.com/s/4ebgnkdhhxo5rac/cel_volden_wiseman%20_coursera.csv?raw=1"))
+
+dat$Party<-recode(dat$dem,`1`="Democrat",`0`="Republican")
+
+
+#######HINT: for Chart D, you'll need to set the height of the renderPlot, using the height argument. Try a value of 750.
+
+#####some data management functions are already included. You need to add the visualization functions.
+
+```
+
+
+Page 1
+======
+
+### Chart A
+
+
+```{r}
+dat %>% 
+  drop_na() %>% 
+  filter(year>1979) %>% 
+  group_by(year,Party) %>% 
+  summarise(passed=sum(all_pass)) %>% 
+
+ggplot(aes(x=year, y = passed, fill=Party)) + geom_area()+
+  labs(x="year",y="All Bills Passed") +
+  ggtitle("Number of Bills Passed since 1980") +
+  scale_fill_manual(values = c("blue", "red"))
+
+
+```
+
+Page 2
+======
+
+Column
+-----------------------------------------------------------------------
+
+
+### Chart B
+
+```{r}
+library(plotly)
+
+dat_view <-dat%>%
+  drop_na()%>%
+  filter(congress==110)
+
+ggplotly(ggplot(dat_view, aes(x=votepct,y=all_pass,label = thomas_name, color =Party))+
+  geom_point()+
+  geom_smooth()+
+  labs(y="All Pass", x = "Vote Pct.") +
+  ggtitle("Passage and Vote Pct., 110th Congress")+
+  scale_color_manual(values = c("blue", "red"), labels = c("Republican", "Democrat"))
+  )
+
+
+```
+
+Column
+-----------------------------------------------------------------------
+
+### Chart C
+
+```{r}
+dat_view <-dat%>%
+  drop_na()%>%
+  filter(congress==110)
+
+ggplotly(ggplot(dat_view, aes(x=dwnom1,y=all_pass,label = thomas_name, color=Party))+
+  geom_point()+
+  geom_smooth(method = "lm")+
+  labs(y="All Pass", x = "DW Nominate.") +
+  ggtitle("Passage and Ideology, 110th Congress")+
+  scale_color_manual(values = c("blue", "red"), labels = c("Republican", "Democrat"))
+  )
+```
+
+Page 3
+======
+
+Input{.sidebar}
+----------------------------------------------------------------
+### Chart D
+
+```{r}
+selectInput("State", "State", dat$st_name, multiple = TRUE, selected=dat$st_name)
+```
+
+Column
+----------------------------------------------------------------
+
+```{r}
+
+####hint: this figure uses selectInput with the multiple option set to true and with the options set up so that all states are initially selected.
+
+
+dat_viz <- dat %>% 
+  group_by(st_name) %>% 
+  filter(congress==110) %>%
+  summarise(passed=sum(all_pass))
+
+renderPlot(
+    ggplot(filter(dat_viz,st_name %in% input$State),aes(y=st_name,x=passed))+
+    geom_bar(stat='identity') +
+    labs(y="State Name", x = "Total Bills Passed Per State") +
+    ggtitle("Total Bills Passed by State Delegations, 110th Congress"), 
+    height = 750)
+
+```
+
