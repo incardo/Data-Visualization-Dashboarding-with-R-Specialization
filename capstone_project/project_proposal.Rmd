@@ -1,5 +1,5 @@
 ---
-title: "Project Proposal"
+title: "World Development indicators Dashboard"
 author: "Rocco Incardona"
 output: html_document
 ---
@@ -10,61 +10,71 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Project Topic
 
-Identify the subject of your project. What are you going to be making your visualizations about?
-
-Some examples of possible topics:
-* Educational achievement in a country/province/city
-* Sports - player statistics and performance of a team
-* Political survey data like what we've used in previous courses in this specialization
-* Business data - prices, company performance, budget data, productivity data
-
-Please indicate in as much detail as possible what the topic is going to be.
-
 The scope of this project is to build an interactive dashboard using R-Shiny and flexdashboard.
-The dashboard will present some advanced visualizations on a selection of World Bank's Development indicators. The main categories of indicators which will be covered are: Economy, Environment and People.The charts will try to shed some light
-on the different environmental impact of each country and its main economic and social drivers
+The dashboard will present some advanced visualizations on a selection of World Bank's Development indicators, covering the following areas: Environment, Economy and People. In particular, the charts will try to shed some light
+on the countries, which have the strongest impact on the environment (e.g. in terms of carbon emissions or energy consumption) and try to identify which economic and social drivers could be behind those developments. 
 
-See also:
-
-* https://datatopics.worldbank.org/world-development-indicators/themes/economy.html
-* https://datatopics.worldbank.org/world-development-indicators/themes/environment.html
-* https://datatopics.worldbank.org/world-development-indicators/themes/people.html
 
 ## Data Sources
 
-Please identify the source(s) of data you will use for your project. Provide links to websites and citations for the data. Who created these data? How were they collected?
+The World Development Indicators is a compilation of relevant, high-quality, and internationally comparable statistics about global development and the fight against poverty. The database contains 1,400 time series indicators for 217 economies and more than 40 country groups, with data for many indicators going back more than 50 years. The data is compiled by the World Bank using officially-recognized international sources. 
 
-The World Development Indicators is a compilation of relevant, high-quality, and internationally comparable statistics about global development and the fight against poverty. The database contains 1,400 time series indicators for 217 economies and more than 40 country groups, with data for many indicators going back more than 50 years.
+The indicators covered in this projected are described in detail on the following pages:
+
+* Main page: https://datatopics.worldbank.org/world-development-indicators/
+* Environment: https://datatopics.worldbank.org/world-development-indicators/themes/environment.html
+* Economy: https://datatopics.worldbank.org/world-development-indicators/themes/economy.html
+* People: https://datatopics.worldbank.org/world-development-indicators/themes/people.html
 
 ## Description of the Data
 
-Please provide specific details about your data.
- 
-* If the data covers a timespan, what is the time period?
-* If the data covers a geographical location, what geographical location(s)?
-* If the data is about a business, political, or non-governmental entity or activity, which entities or activities does it cover? For example is the data about economics, schools, politics, sports, or something else?
-* What characteristics are captured by the data? For example, if your data is about cities, what characteristics of the cities are captured in the data? Population, crime rates, economic measures, business activity, traffic?
-* Assuming your data is rectangular (like a spreadsheet), how many rows and columns are in the dataset? If your data is not rectangular, how are you going to create a "tidy" dataset from these data?
+The World Development indicators used in the project have annual frequency and are available for almost 217 economies and different macro-regions. The overall dataset includes around 380.000 rows and 65 columns (including descriptions and years), but only a subset of these data will be used. In particular, the following indicators will be covered:
 
-Website: https://datatopics.worldbank.org/world-development-indicators/
+* Environment:
+  + EN.BIR.THRD.NO	Environment: Biodiversity & protected areas	Bird species, threatened
+  + EN.FSH.THRD.NO	Environment: Biodiversity & protected areas	Fish species, threatened
+  + EN.HPT.THRD.NO	Environment: Biodiversity & protected areas	Plant species (higher), threatened
+  + EN.MAM.THRD.NO	Environment: Biodiversity & protected areas	Mammal species, threatened
+  + EN.POP.DNST	Environment: Density & urbanization	Population density (people per sq. km of land area)
+  + SP.URB.TOTL.IN.ZS	Environment: Density & urbanization	Urban population (% of total population)
+  + EN.ATM.CO2E.KT	Environment: Emissions	Total CO2 emissions (thousand metric tons of CO2 excluding Land-Use Change and Forestry)
+  + EN.ATM.GHGT.KT.CE	Environment: Emissions	Total greenhouse gas emissions (thousand metric tons of CO2 equivalent excluding Land-Use Change and Forestry)
+  + EG.ELC.FOSL.ZS	Environment: Energy production & use	Electricity production from oil, gas and coal sources (% of total)
+  + EG.USE.COMM.CL.ZS	Environment: Energy production & use	Alternative and nuclear energy (% of total energy use)
+  + EG.IMP.CONS.ZS	Environment: Energy production & use	Energy imports, net (% of energy use)
 
-World Development Indicators is compiled by the World Bank and international partners. The database presents global economic conditions in six categories: World View, People, Environment, Economy, States and Markets, and Global Linkages. There are over 900 variables for 208 economies from 1960 to the present.
+* Economy:
+  + NY.GDP.MKTP.PP.CD	Economic Policy & Debt: Purchasing power parity	GDP, PPP (current international $)
+  + NY.GDP.PCAP.PP.CD	Economic Policy & Debt: Purchasing power parity	GDP per capita, PPP (current international $)
+  + NE.RSB.GNFS.ZS	Economic Policy & Debt: National accounts: Shares of GDP & other	External balance on goods and services (% of GDP)
+  + NE.TRD.GNFS.ZS	Economic Policy & Debt: National accounts: Shares of GDP & other	Trade (% of GDP)
+  + NV.IND.MANF.ZS	Economic Policy & Debt: National accounts: Shares of GDP & other	Manufacturing, value added (% of GDP)
+  + NE.CON.PRVT.PP.CD	Economic Policy & Debt: Purchasing power parity	Households and NPISHs Final consumption expenditure, PPP (current international $)
 
-World Development Indicators provides measures of social progress, quality of life, economic development, physical infrastructure, environment and government performance.
+* Society:
+  + SP.POP.TOTL	Health: Population: Structure	Population, total
+  + SP.POP.GROW	Health: Population: Dynamics	Population growth (annual %)
+  + SP.DYN.TFRT.IN	Health: Reproductive health	Fertility rate, total (births per woman)
+  + HD.HCI.OVRL	Public Sector: Policy & institutions	Human capital index (HCI) (scale 0-1)
+  + IQ.CPA.GNDR.XQ	Public Sector: Policy & institutions	CPIA gender equality rating (1=low to 6=high)
+  + SP.DYN.CBRT.IN	Health: Population: Dynamics	Birth rate, crude (per 1,000 people)
+  + SP.DYN.CDRT.IN	Health: Population: Dynamics	Death rate, crude (per 1,000 people)
+  + VC.IDP.NWCV	Public Sector: Conflict & fragility	Internally displaced persons, new displacement associated with conflict and violence (number of cases)
+  + VC.IDP.NWDS	Public Sector: Conflict & fragility	Internally displaced persons, new displacement associated with disasters (number of cases)
+  + VC.IDP.TOCV	Public Sector: Conflict & fragility	Internally displaced persons, total displaced by conflict and violence (number of people)
 
-The World Bank Data Catalogue provides access to related statistical series including; International Debt Statistics, Millennium Development Indicators, Education Statistics and Gender Statistics. Other World Bank research resources are introduced on this EUI Library page.
+Since the data is shaped in a wide form (one indicator and country for each row and several years in the columns), data reshaping will be necessary to simplify the visualizations (i.e. creating one unique year column)
+
+## Main charts:
+
+The project will include eight figures: 1) choropleths 2) bar chart 3) animated map 4) line plots 5) scatter plot 6) box plot
+7) proportional area and 8) Sankey diagram. A small description for three of the chart type above is provided:
+
+1) Choropleth. Given that the dataset includes several indicators for most of the countries of the world, an interactive choropleth will be shown allowing the users to select one of the indicators described in the previous section and plot it in a world or regional map.
+
+2) Bar chart. The idea is to display CO2 emissions ranking by country in an animated bar charts which changes over time.
+
+3) Scatter plot. The chart will diplay the interaction between different environmental and socio-economic variables.
+The user can select which variables will be displayed.
 
 
-## Ideas about the figures that you will create to visualize this data:
-
-Please provide ideas for the figures you are going to generate from these data. Are you going to make line plots, bar charts, density plot, dumbbell charts, choropleths, or what? You should provide a description of at least three figures. Your final project will include eight figures.
-
-The project will include eigth figures:
-1) choroplets
-2) bar chart
-3) animated map
-4) line plots
-5) scatter plot 
-6) box plot
-7) proportional area
-8) sankey diagram
