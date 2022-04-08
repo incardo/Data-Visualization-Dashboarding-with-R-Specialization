@@ -1,6 +1,6 @@
 ---
 title: "Visualization Critique"
-author: "YOUR NAME HERE"
+author: "Rocco Incardona"
 output: html_document
 ---
 
@@ -12,13 +12,43 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Please provide a link to your visualization critique.
 
-<http://www.example.com>[www.example.com]
+I have decided to analyse the following chart extracted from r/DataIsBeautiful:
+https://www.reddit.com/r/dataisbeautiful/comments/tylkr8/oc_there_is_a_world_shortage_of_wheat_russia_is/
+
+```{r out.width="300px"}
+url <- "https://i.redd.it/dg93eqsav5s81.png"
+knitr::include_graphics(url)
+
+```
+
 
 ## Weakness
 
 What do you see as a significant weakness of this visualization? How could you improve it to make it clearer, easier to understand, or more impactful? Make sure you provide some detail in justifying your answer.
 
+Despite the great impact of its graphics, I believe it is worth to mention the following weaknesses:
+
+* Figures on the map are not easily comparable (see the big gap between Turkey and Kazakhstan)
+* the amount of data displayed is very limited (only five figures) and does not include for instance any information on the other importers
+* The color also does not seem to be used to denote any change in value: Russia appears in bright yellow while importers have all the same color.
+* Given that Ukraine is also a large producer of wheat I would have tried to include this information as comparison
+
+To better have an idea of the proportions, the map could be paired with a bar charts. A bar chart could also include more countries. Finally, I would have included a reference to the overall export of wheat from Russia.
+
 ## Strength
 
 What do you see as a strength of this visualization? Is there a specific choice of the designer that made it especially useful or impactful? Make sure you provide some detail in justifying your answer.
+
+Among the strengths of this visualization:
+
+* Simplicity - The amount of data is limited and therefore easy to absorbe, while the nice visual and color are catchy and connected to the topic (arrows = flows, yellow + symbols = wheat)
+* Infographic format, therefore easy to share on social networks
+* The title and the source are clearly specified, so the reader can try to find more information on the topic
+* Non relevant areas are greyed out.
+
+Clearly the author wanted to design something that is simple and eye-catchy and that can be shared quickly.
+This was done at the cost of the amount of information displayed
+
+
+
 
