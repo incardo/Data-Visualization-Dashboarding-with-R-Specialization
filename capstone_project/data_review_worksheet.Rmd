@@ -1,0 +1,75 @@
+---
+title: "Data Review"
+author: "YOUR NAME HERE"
+date: "11/10/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+
+#####Make sure you load any required packages.
+
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+## Import Your Data
+
+In the following code hunk, import your data.
+
+```{r data_import}
+
+#### Use read_csv() or another function
+
+#### Make sure your data is converted into a tibble. 
+
+#### For demonstration purposes, this example uses the mtcars data.
+
+data(mtcars)
+
+dat<-tibble(mtcars)
+
+
+```
+
+## Part 1
+
+Using words, describe the visualization you are going to make using which variables/characteristics in your data:
+
+*Example*: For my first figure, I am going to create a scatterplot that plots vehicle weight on the x axis and miles per gallon the y axis. I will create a two column tibble with these data.
+
+In the code chunk below, show your work filtering the data and create the subset of data you will display graphically.
+
+```{r data_1}
+fig_dat1<-dat %>% select(wt,mpg)
+####make sure you call the data so it will display in your report
+fig_dat1
+```
+
+## Part 2
+
+Using words, describe the *second* visualization you are going to make using which variables/characteristics in your data:
+
+*Example*: For my second figure, I am going to create a boxplot that includes three boxplots for miles per gallon, horsepower, and weight.
+
+In the code chunk below, show your work filtering the data and create the subset of data you will display graphically.
+
+```{r data_2}
+fig_dat2<-dat %>% select(mpg,hp,wt)
+####make sure you call the data so it will display in your report
+fig_dat2
+```
+
+
+## Part 3
+
+Using words, describe the *third* visualization you are going to make using which variables/characteristics in your data:
+
+*Example*: For the third figure, I will display a density plot of the quarter mile time for six cylinder cars.
+
+```{r data_3}
+fig_dat3<-dat %>% filter(cyl==6) %>% select(qsec) 
+####make sure you call the data so it will display in your report
+fig_dat3
+```
+
