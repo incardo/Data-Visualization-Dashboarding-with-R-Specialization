@@ -1,7 +1,7 @@
 ---
 title: "Data Review"
-author: "YOUR NAME HERE"
-date: "11/10/2020"
+author: "Rocco Incardona"
+date: "25/04/2022"
 output: html_document
 ---
 
@@ -9,8 +9,14 @@ output: html_document
 
 #####Make sure you load any required packages.
 
+
+#https://econandrew.github.io/wdi-api-R-gettingstarted/using-r-to-access-the-world-bank-api.html
+#install.packages("wbstats")
+
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(wbstats)
+
 ```
 
 ## Import Your Data
@@ -20,17 +26,51 @@ In the following code hunk, import your data.
 ```{r data_import}
 
 #### Use read_csv() or another function
-
+# Environment:
+  # EN.BIR.THRD.NO Environment: Biodiversity & protected areas Bird species, threatened
+  # EN.FSH.THRD.NO Environment: Biodiversity & protected areas Fish species, threatened
+  # EN.HPT.THRD.NO Environment: Biodiversity & protected areas Plant species (higher), threatened
+  # EN.MAM.THRD.NO Environment: Biodiversity & protected areas Mammal species, threatened
+  # EN.POP.DNST Environment: Density & urbanization Population density (people per sq. km of land area)
+  # SP.URB.TOTL.IN.ZS Environment: Density & urbanization Urban population (% of total population)
+  # EN.ATM.CO2E.KT Environment: Emissions Total CO2 emissions (thousand metric tons of CO2 excluding Land-Use Change and Forestry)
+  # EN.ATM.GHGT.KT.CE Environment: Emissions Total greenhouse gas emissions (thousand metric tons of CO2 equivalent excluding Land-Use Change and Forestry)
+  # EG.ELC.FOSL.ZS Environment: Energy production & use Electricity production from oil, gas and coal sources (% of total)
+# EG.USE.COMM.CL.ZS Environment: Energy production & use Alternative and nuclear energy (% of total energy use)
+# EG.IMP.CONS.ZS Environment: Energy production & use Energy imports, net (% of energy use)
+# Economy:
+# NY.GDP.MKTP.PP.CD Economic Policy & Debt: Purchasing power parity GDP, PPP (current international $)
+# NY.GDP.PCAP.PP.CD Economic Policy & Debt: Purchasing power parity GDP per capita, PPP (current international $)
+# NE.RSB.GNFS.ZS Economic Policy & Debt: National accounts: Shares of GDP & other External balance on goods and services (% of GDP)
+# NE.TRD.GNFS.ZS Economic Policy & Debt: National accounts: Shares of GDP & other Trade (% of GDP)
+# NV.IND.MANF.ZS Economic Policy & Debt: National accounts: Shares of GDP & other Manufacturing, value added (% of GDP)
+# NE.CON.PRVT.PP.CD Economic Policy & Debt: Purchasing power parity Households and NPISHs Final consumption expenditure, PPP (current international $)
+# Society:
+# SP.POP.TOTL Health: Population: Structure Population, total
+# SP.POP.GROW Health: Population: Dynamics Population growth (annual %)
+# SP.DYN.TFRT.IN Health: Reproductive health Fertility rate, total (births per woman)
+# HD.HCI.OVRL Public Sector: Policy & institutions Human capital index (HCI) (scale 0-1)
+# IQ.CPA.GNDR.XQ Public Sector: Policy & institutions CPIA gender equality rating (1=low to 6=high)
+# SP.DYN.CBRT.IN Health: Population: Dynamics Birth rate, crude (per 1,000 people)
+# SP.DYN.CDRT.IN Health: Population: Dynamics Death rate, crude (per 1,000 people)
+# VC.IDP.NWCV Public Sector: Conflict & fragility Internally displaced persons, new displacement associated with conflict and violence (number of cases)
+# VC.IDP.NWDS Public Sector: Conflict & fragility Internally displaced persons, new displacement associated with disasters (number of cases)
+# VC.IDP.TOCV Public Sector: Conflict & fragility Internally displaced persons, total displaced by conflict and violence (number of people)
 #### Make sure your data is converted into a tibble. 
 
-#### For demonstration purposes, this example uses the mtcars data.
+list_indicators <- c("EN.BIR.THRD.NO", "EN.FSH.THRD.NO", "EN.POP.DNST")
 
-data(mtcars)
-
-dat<-tibble(mtcars)
+society <- c("EN.POP.DNST")
 
 
-```
+df <- wb_data(country = "countries_only", indicator = society)
+df
+
+plot(df$EN.POP.DNST)
+
+max(df$EN.POP.DNST, na.rm = TRUE)
+
+    ```
 
 ## Part 1
 
