@@ -18,20 +18,19 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(wbstats)
 library(tictoc)
+library(plotly)
+
 ```
 
-## Import Your Data
+## Data import and availability
 
-In the following code hunk, import your data.
+In the following code chunk, I import my data and visualize how many countries are available over time for each indicator.
 
-```{r data_import}
+```{r data_import, , warning=FALSE}
 
-#### Use read_csv() or another function
-#### Make sure your data is converted into a tibble. 
-
-environment <- c("EN.POP.DNST", "EN.ATM.CO2E.KT", "EN.ATM.GHGT.KT.CE", "EG.ELC.FOSL.ZS", "EG.USE.COMM.CL.ZS")
+environment <- c("EN.POP.DNST", "EN.ATM.CO2E.KT", "EN.ATM.GHGT.KT.CE", "EG.ELC.FOSL.ZS")
 economy <- c("NY.GDP.MKTP.PP.CD", "NY.GDP.PCAP.PP.CD", "NE.RSB.GNFS.ZS")
-society <- c("SP.POP.TOTL", "SP.POP.GROW", "HD.HCI.OVRL")
+society <- c("SP.POP.TOTL", "SP.POP.GROW")
 all_indicators <- c(environment,economy,society)
 
 tic()
@@ -49,37 +48,40 @@ df %>% group_by(date) %>% summarise_all(funs(sum(!is.na(.)))) %>%
 
 summary(df)
 
-# indicator <- "HD.HCI.OVRL"
+# indicator <- "EG.ELC.FOSL.ZS"
 # df %>% select(country, date, indicator) %>% filter(!is.na(indicator)) %>% select(country) %>% unique %>% print(n = Inf)
-
-wb_search("SP.POP.TOTL") %>% View()
+#wb_search("SP.POP.TOTL")
 
 ```
 
 ## Part 1
 
-Using words, describe the visualization you are going to make using which variables/characteristics in your data:
+For my first figure, I am going to create an interactive choropleth displaying for most of the countries of the world one of the following indicators from 1980 to 2022:
 
-*Example*: For my first figure, I am going to create a scatterplot that plots vehicle weight on the x axis and miles per gallon the y axis. I will create a two column tibble with these data.
+* EN.ATM.CO2E.KT Environment: Emissions Total CO2 emissions (thousand metric tons of CO2 excluding Land-Use Change and Forestry);
+* SP.POP.TOTL Health: Population: Structure Population, total);
+* NY.GDP.MKTP.PP.CD Economic Policy & Debt: Purchasing power parity GDP, PPP (current international $)
 
-In the code chunk below, show your work filtering the data and create the subset of data you will display graphically.
+The data will be extracted from the World Bank using the wbstats package and will be structured as a tibble containing 5 columns (the three indicators plus the country and the date). Data will be visualized with plotly.
 
 ```{r data_1}
-fig_dat1<-dat %>% select(wt,mpg)
+fig_dat1<-df %>% select(iso3c, country,date, EN.ATM.CO2E.KT, SP.POP.TOTL, NY.GDP.MKTP.PP.CD) %>% filter(date>=1980)
+
 ####make sure you call the data so it will display in your report
 fig_dat1
+
+# plot_ly(fig_dat1, type='choropleth', locations=fig_dat1$iso3c, z=fig_dat1$SP.POP.TOTL, text=fig_dat1$country, colorscale="Blues")
+
 ```
 
 ## Part 2
 
-Using words, describe the *second* visualization you are going to make using which variables/characteristics in your data:
-
-*Example*: For my second figure, I am going to create a boxplot that includes three boxplots for miles per gallon, horsepower, and weight.
-
-In the code chunk below, show your work filtering the data and create the subset of data you will display graphically.
+For my second figure, I am going to create a dynamic bar chart, which displays the top 10 countries which have emitted the most CO2 each year from 1980 to 2020 (e.g. example here https://towardsdatascience.com/create-animated-bar-charts-using-r-31d09e5841da).
+Example of extraction for one year below:
 
 ```{r data_2}
-fig_dat2<-dat %>% select(mpg,hp,wt)
+fig_dat2<-df %>% select(iso3c, country,date, EN.ATM.CO2E.KT) %>% filter(date==2000) %>% slice_max(EN.ATM.CO2E.KT, n = 10)
+  
 ####make sure you call the data so it will display in your report
 fig_dat2
 ```
@@ -87,13 +89,29 @@ fig_dat2
 
 ## Part 3
 
-Using words, describe the *third* visualization you are going to make using which variables/characteristics in your data:
+For the third figures, I will display a scatter plot showing the interaction between the following environmental and economic variables:
 
-*Example*: For the third figure, I will display a density plot of the quarter mile time for six cylinder cars.
+* NY.GDP.PCAP.PP.CD Economic Policy & Debt: Purchasing power parity GDP per capita, PPP (current international $)
+* Total greenhouse gas emissions per capita, obtained as a ratio of the following variables:
+
+    + EN.ATM.GHGT.KT.CE Environment: Emissions Total greenhouse gas emissions (thousand metric tons of CO2 equivalent excluding Land-Use Change and Forestry)
+    + SP.POP.TOTL Health: Population: Structure Population, total);
+
+The scatter plot will be animated to show the evolution over time.
+
+Example of extraction for one year below:
 
 ```{r data_3}
-fig_dat3<-dat %>% filter(cyl==6) %>% select(qsec) 
+
+fig_dat3<-df %>% select(iso3c, country,date, SP.POP.TOTL, NY.GDP.PCAP.PP.CD, EN.ATM.GHGT.KT.CE) %>%
+mutate(green_house_emissions_pc = EN.ATM.GHGT.KT.CE/SP.POP.TOTL) %>% filter(date==2015)
+  
 ####make sure you call the data so it will display in your report
 fig_dat3
+
+#ggplot(fig_dat3, aes(x=NY.GDP.PCAP.PP.CD, y=green_house_emissions_pc)) + geom_point() +  geom_text(aes(label = iso3c))
+
 ```
+
+
 
