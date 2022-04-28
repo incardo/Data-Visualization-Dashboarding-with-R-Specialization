@@ -1,6 +1,6 @@
 ---
-title: "Visualization Critique"
-author: "YOUR NAME HERE"
+title: "Visualization Critique 2"
+author: "Rocco Incardona"
 output: html_document
 ---
 
@@ -12,12 +12,33 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Please provide a link to your visualization critique.
 
-<http://www.example.com>[www.example.com]
+I have decided to analyse the following chart extracted from r/DataIsBeautiful and published by the Financial Times:
+https://www.reddit.com/r/dataisbeautiful/comments/udux0e/oc_animation_showing_shipments_of_russian_fossil/
+
+
 
 ## Weakness
 
 What do you see as a significant weakness of this visualization? How could you improve it to make it clearer, easier to understand, or more impactful? Make sure you provide some detail in justifying your answer.
 
+Despite the great impact of its graphics, I believe it is worth to mention the following weaknesses:
+
+* Bubbles on the map are not easily comparable, although the legend gives an indication on the top left. I would have added labels on top of the bubbles to be clearer.
+* The bands displaying the value of shipments are visually very interesting, but once again, it is difficult to compare the different figures and to assess which flows contributed the most to the cumulative values. There are also some shipments that seem directed towards countries outside the map.
+* The date on the top right does not provide much info (the variation over time is difficult to perceive). I would have added the total amount of exported fossil fuels close to the date.
+* There is no breakdown of the different fossil fuels, and the map can be partially misleading since some countries are simply used for transit (e.g. the Netherlands). The yellow circles could have been displayed as pie charts to give the breakdown by fossil fuels.
+
 ## Strength
 
 What do you see as a strength of this visualization? Is there a specific choice of the designer that made it especially useful or impactful? Make sure you provide some detail in justifying your answer.
+
+Among the strengths of this visualization:
+
+* Eye-catching - the map clearly highlights the major routes for the export of fossil fuels from Russia.
+* The title and the source are clearly specified, so the reader can try to find more information on the topic.
+* The major importers of fossil fuels are highlighted through the use of labels.
+* The animations seems to show a very large number of shipments in a compact and direct way.
+
+Clearly the author wanted to design something that is eye-catchy and that shows a relatively large amount of data.
+This was done at the cost of precision in reading (difficult to compare figures) and interpretability.
+
