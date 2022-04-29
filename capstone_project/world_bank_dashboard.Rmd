@@ -1,0 +1,158 @@
+---
+title: "World Bank dashboard"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(tidyverse)
+library(plotly)
+library(shiny)
+
+library(tictoc)
+#library(WDI)
+library(wbstats)
+
+
+environment <- c("EN.POP.DNST", "EN.ATM.CO2E.KT", "EN.ATM.GHGT.KT.CE", "EG.ELC.FOSL.ZS")
+economy <- c("NY.GDP.MKTP.PP.CD", "NY.GDP.PCAP.PP.CD", "NE.RSB.GNFS.ZS")
+society <- c("SP.POP.TOTL", "SP.POP.GROW")
+all_indicators <- c(environment,economy,society)
+
+tic()
+df <- wb_data(country = "countries_only", indicator = all_indicators, start_date = 1980, end_date = 1980)
+toc()
+dim(df)
+
+
+# Check available data
+#df %>% group_by(date) %>% summarise_all(funs(sum(!is.na(.)))) %>% print(n = Inf)
+
+# df %>% group_by(date) %>% summarise_all(funs(sum(!is.na(.)))) %>%
+#   gather(key="measure", value="value", all_indicators) %>%
+#   ggplot(aes(x = date, y = value)) + geom_bar(stat = "identity") +
+#   facet_wrap(~measure)
+# 
+# summary(df)
+
+# indicator <- "EG.ELC.FOSL.ZS"
+# df %>% select(country, date, indicator) %>% filter(!is.na(indicator)) %>% select(country) %>% unique %>% print(n = Inf)
+
+```
+
+
+
+Page 1
+======
+
+### Chart A
+
+
+```{r}
+# dat %>% 
+#   drop_na() %>% 
+#   filter(year>1979) %>% 
+#   group_by(year,Party) %>% 
+#   summarise(passed=sum(all_pass)) %>% 
+
+#orthographic - 'natural earth'
+
+fig_dat1<-df %>% select(iso3c, country,date, EN.ATM.CO2E.KT, SP.POP.TOTL, NY.GDP.MKTP.PP.CD) %>% filter(date==1980)
+
+####make sure you call the data so it will display in your report
+#fig_dat1
+
+g <- list(projection = list(type = 'orthographic'), showland = TRUE, landcolor = toRGB("#e5ecf6"))
+plot_ly(fig_dat1, type='choropleth', locations=fig_dat1$iso3c, z=fig_dat1$SP.POP.TOTL, text=fig_dat1$country, colorscale="Blues", reversescale = T) %>% layout(geo = g)
+
+
+```
+
+Page 2
+======
+
+Column
+-----------------------------------------------------------------------
+
+
+### Chart B
+
+```{r}
+# library(plotly)
+# 
+# dat_view <-dat%>%
+#   drop_na()%>%
+#   filter(congress==110)
+# 
+# ggplotly(ggplot(dat_view, aes(x=votepct,y=all_pass,label = thomas_name, color =Party))+
+#   geom_point()+
+#   geom_smooth()+
+#   labs(y="All Pass", x = "Vote Pct.") +
+#   ggtitle("Passage and Vote Pct., 110th Congress")+
+#   scale_color_manual(values = c("blue", "red"), labels = c("Republican", "Democrat"))
+#   )
+
+
+```
+
+Column
+-----------------------------------------------------------------------
+
+### Chart C
+
+```{r}
+# dat_view <-dat%>%
+#   drop_na()%>%
+#   filter(congress==110)
+# 
+# ggplotly(ggplot(dat_view, aes(x=dwnom1,y=all_pass,label = thomas_name, color=Party))+
+#   geom_point()+
+#   geom_smooth(method = "lm")+
+#   labs(y="All Pass", x = "DW Nominate.") +
+#   ggtitle("Passage and Ideology, 110th Congress")+
+#   scale_color_manual(values = c("blue", "red"), labels = c("Republican", "Democrat"))
+#   )
+```
+
+Page 3
+======
+
+Input{.sidebar}
+----------------------------------------------------------------
+### Chart D
+
+```{r}
+#selectInput("State", "State", dat$st_name, multiple = TRUE, selected=dat$st_name)
+```
+
+Column
+----------------------------------------------------------------
+
+```{r}
+
+####hint: this figure uses selectInput with the multiple option set to true and with the options set up so that all states are initially selected.
+
+
+# dat_viz <- dat %>% 
+#   group_by(st_name) %>% 
+#   filter(congress==110) %>%
+#   summarise(passed=sum(all_pass))
+# 
+# renderPlot(
+#     ggplot(filter(dat_viz,st_name %in% input$State),aes(y=st_name,x=passed))+
+#     geom_bar(stat='identity') +
+#     labs(y="State Name", x = "Total Bills Passed Per State") +
+#     ggtitle("Total Bills Passed by State Delegations, 110th Congress"), 
+#     height = 750)
+
+```
+
+
+
+
+
+
