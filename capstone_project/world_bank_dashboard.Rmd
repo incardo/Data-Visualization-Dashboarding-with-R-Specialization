@@ -49,8 +49,18 @@ dim(df)
 Page 1
 ======
 
+Input{.sidebar}
+----------------------------------------------------------------
 ### Chart A
 
+```{r}
+fig_dat1<-df %>% select(iso3c, country,date, EN.ATM.CO2E.KT, SP.POP.TOTL, NY.GDP.MKTP.PP.CD) %>% filter(date==1980)
+
+selectInput("Indicator", "Indicator", c("EN.ATM.CO2E.KT", "SP.POP.TOTL", "NY.GDP.MKTP.PP.CD"), multiple = FALSE, selected="SP.POP.TOTL")
+```
+    
+Column
+----------------------------------------------------------------
 
 ```{r}
 # dat %>% 
@@ -61,14 +71,19 @@ Page 1
 
 #orthographic - 'natural earth'
 
-fig_dat1<-df %>% select(iso3c, country,date, EN.ATM.CO2E.KT, SP.POP.TOTL, NY.GDP.MKTP.PP.CD) %>% filter(date==1980)
 
 ####make sure you call the data so it will display in your report
 #fig_dat1
 
-g <- list(projection = list(type = 'orthographic'), showland = TRUE, landcolor = toRGB("#e5ecf6"))
-plot_ly(fig_dat1, type='choropleth', locations=fig_dat1$iso3c, z=fig_dat1$SP.POP.TOTL, text=fig_dat1$country, colorscale="Blues", reversescale = T) %>% layout(geo = g)
+fig_dat1<-df %>% select(iso3c, country,date, EN.ATM.CO2E.KT, SP.POP.TOTL, NY.GDP.MKTP.PP.CD) %>% filter(date==1980)
 
+renderText(input$Indicator)
+g <- list(projection = list(type = 'orthographic'), showland = TRUE, landcolor = toRGB("#e5ecf6"))
+renderPlotly(plot_ly(fig_dat1, type='choropleth', locations=fig_dat1$iso3c, z=fig_dat1[, input$Indicator], text=fig_dat1$country, colorscale="Blues", reversescale = T) %>% layout(geo = g))
+
+  # output$selected_var <- renderText({ 
+  #   "You have selected this"
+  # })
 
 ```
 
