@@ -11,6 +11,7 @@ runtime: shiny
 library(flexdashboard)
 library(tidyverse)
 library(plotly)
+library(ggplot2)
 library(shiny)
 
 library(tictoc)
@@ -24,7 +25,7 @@ society <- c("SP.POP.TOTL", "SP.POP.GROW")
 all_indicators <- c(environment,economy,society)
 
 tic()
-df <- wb_data(country = "countries_only", indicator = all_indicators, start_date = 1990, end_date = 2022)
+df <- wb_data(country = "countries_only", indicator = all_indicators, start_date = 1990, end_date = 2020)
 toc()
 dim(df)
 
@@ -54,19 +55,35 @@ Input{.sidebar}
 ### Chart A
 
 ```{r}
-# fig_dat1<-df %>% select(iso3c, country,date, EN.ATM.CO2E.KT, SP.POP.TOTL, NY.GDP.MKTP.PP.CD) %>% filter(date==2000)
 
-selectInput("Indicator", "Indicator", c("EN.ATM.CO2E.KT", "SP.POP.TOTL", "NY.GDP.MKTP.PP.CD"), multiple = FALSE, selected="SP.POP.TOTL")
+selectInput("Indicator", "Indicator", 
+            c("Total CO2 emissions" = "EN.ATM.CO2E.KT", 
+              "Total population" = "SP.POP.TOTL", 
+              "Purchasing power parity GDP" = "NY.GDP.MKTP.PP.CD"), 
+            multiple = FALSE, selected="SP.POP.TOTL")
 
 sliderInput("dateSel", "Date",
-            min = min(df$date),
-            max = max(df$date),
-            value = min(df$date),
+            min = min(df$date, na.rm = TRUE),
+            max = max(df$date, na.rm = TRUE),
+            value = min(df$date, na.rm = TRUE),
             step = 1,
             timeFormat = "%d %b %y",
             animate = animationOptions(interval = 500, loop = FALSE),
             sep = ""
 )
+
+# Change slider input date based on the availability of the selected indicator
+observeEvent(input$Indicator, {
+    df[[input$Indicator]]
+  
+    df_range <- df %>% select(iso3c, country,date, as.name(input$Indicator)) %>% filter(!is.na(df[[input$Indicator]]))
+    
+    updateSliderInput(session, "dateSel", 
+                      min = min(df_range$date,na.rm = TRUE),
+                      max = max(df_range$date,na.rm = TRUE)
+                      )
+
+  })
 
 
 ```
@@ -75,22 +92,21 @@ Column
 ----------------------------------------------------------------
 
 ```{r}
-# dat %>% 
-#   drop_na() %>% 
-#   filter(year>1979) %>% 
-#   group_by(year,Party) %>% 
-#   summarise(passed=sum(all_pass)) %>% 
-
 #orthographic - 'natural earth'
+titles <-   c("Total CO2 emissions" = "EN.ATM.CO2E.KT", 
+              "Total population" = "SP.POP.TOTL", 
+              "Purchasing power parity GDP" = "NY.GDP.MKTP.PP.CD")
 
-# plot_ly(fig_dat1, type='choropleth', locations=fig_dat1$iso3c, z=fig_dat1[["SP.POP.TOTL"]], text=fig_dat1$country, colorscale="Blues", reversescale = T, height = 750)  %>%
-# layout(geo = g)
-
-
-renderText(input$Indicator)
+renderText(names(titles)[titles == input$Indicator])
 renderText(input$dateSel)
+renderText(df %>% select(iso3c, country,date, as.name(input$Indicator)) %>% filter(!is.na(df[[input$Indicator]])) %>% select(date) %>% max(na.rm = TRUE))
+#renderTable(df %>% select(iso3c, country,date, input$Indicator) %>% filter(!is.na(input$Indicator)) %>% select(date) %>% distinct())
 
-#renderTable(fig_dat1[, (names(fig_dat1) %in% input$Indicator)])
+#df %>% select(iso3c, country,date, as.name(input$Indicator)) %>% filter(!is.na(df[[input$Indicator]])) %>% select(date) %>% max(na.rm = TRUE)
+# renderText({
+#   fig_dat_all<-df %>% select(iso3c, country,date, EN.ATM.CO2E.KT, SP.POP.TOTL, NY.GDP.MKTP.PP.CD)
+#   max(fig_dat_all[[input$Indicator]],na.rm = TRUE)
+# })
 
 g <- list(projection = list(type = 'natural earth'), showland = TRUE, landcolor = toRGB("#e5ecf6"))
 
@@ -99,8 +115,6 @@ renderPlotly({
     fig_dat_all<-df %>% select(iso3c, country,date, EN.ATM.CO2E.KT, SP.POP.TOTL, NY.GDP.MKTP.PP.CD)
     fig_dat1<-df %>% select(iso3c, country,date, EN.ATM.CO2E.KT, SP.POP.TOTL, NY.GDP.MKTP.PP.CD) %>% filter(date==input$dateSel)
     
-    
-    
     plot_ly(fig_dat1, type='choropleth', 
             locations=fig_dat1$iso3c, 
             z=fig_dat1[[input$Indicator]], 
@@ -108,9 +122,9 @@ renderPlotly({
             colorscale="Blues", 
             reversescale = T,
             height = 750,
-            zmax = max(fig_dat_all[[input$Indicator]]),
-            zmin = min(fig_dat_all[[input$Indicator]]))  %>% 
-      layout(geo = g)
+            zmax = max(fig_dat_all[[input$Indicator]], na.rm = TRUE),
+            zmin = min(fig_dat_all[[input$Indicator]], na.rm = TRUE)) %>% 
+      layout(geo = g) 
   
   })
 
