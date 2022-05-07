@@ -45,12 +45,13 @@ Input{.sidebar}
 
 ```{r}
 
-titles <-   c("Total CO2 emissions" = "EN.ATM.CO2E.KT", 
-              "Total population" = "SP.POP.TOTL", 
-              "Purchasing power parity GDP" = "NY.GDP.MKTP.PP.CD")    
+titles_indicators <- c("Total CO2 emissions" = "EN.ATM.CO2E.KT", 
+                         "Total population" = "SP.POP.TOTL", 
+                         "Purchasing power parity GDP" = "NY.GDP.MKTP.PP.CD",
+                         "Population growth (annual %)" = "SP.POP.GROW")    
 
 selectInput("Indicator", "Indicator", 
-            titles, 
+            titles_indicators, 
             multiple = FALSE, selected="SP.POP.TOTL")
 
 sliderInput("dateSel", "Date",
@@ -90,19 +91,23 @@ m <- list(autoexpand = TRUE, l = 25, r = 25, b = 100, t = 100, pad = 0)
 
 renderPlotly({
   
-    fig_dat_all<-df %>% select(iso3c, country,date, EN.ATM.CO2E.KT, SP.POP.TOTL, NY.GDP.MKTP.PP.CD)
-    fig_dat1<-df %>% select(iso3c, country,date, EN.ATM.CO2E.KT, SP.POP.TOTL, NY.GDP.MKTP.PP.CD) %>% filter(date==input$dateSel)
-    title_name <- paste(names(titles)[titles == input$Indicator],input$dateSel, sep = " in ")
+    fig_dat_all<- df %>% select(iso3c, country, date, unname(titles_indicators))
+    max_legend <- max(fig_dat_all[[input$Indicator]], na.rm = TRUE)
+    min_legend <- min(fig_dat_all[[input$Indicator]], na.rm = TRUE)
     
-    plot_ly(fig_dat1, type='choropleth', 
-            locations=fig_dat1$iso3c, 
-            z=fig_dat1[[input$Indicator]], 
-            text=fig_dat1$country, 
-            colorscale="Blues", 
+    fig_dat_selected <- df %>% select(iso3c, country, date, unname(titles_indicators)) %>% filter(date==input$dateSel)
+    title_name <- paste(names(titles_indicators)[titles_indicators == input$Indicator],input$dateSel, sep = " in ")
+    
+    
+    plot_ly(fig_dat_selected, type='choropleth', 
+            locations=fig_dat_selected$iso3c, 
+            z = fig_dat_selected[[input$Indicator]], 
+            text = fig_dat_selected$country, 
+            colorscale = ifelse(input$Indicator == "SP.POP.GROW", "Viridis", "Blues"),
             reversescale = T,
             height = 750,
-            zmax = max(fig_dat_all[[input$Indicator]], na.rm = TRUE),
-            zmin = min(fig_dat_all[[input$Indicator]], na.rm = TRUE)) %>% 
+            zmax = max_legend,
+            zmin = min_legend) %>% 
       layout(geo = g, title = title_name , font=t, margin = m, plot_bgcolor = "#e5ecf6") 
   
   })
@@ -119,41 +124,56 @@ Column
 ### Chart B
 
 ```{r}
-# library(plotly)
-# 
-# dat_view <-dat%>%
-#   drop_na()%>%
-#   filter(congress==110)
-# 
-# ggplotly(ggplot(dat_view, aes(x=votepct,y=all_pass,label = thomas_name, color =Party))+
-#   geom_point()+
-#   geom_smooth()+
-#   labs(y="All Pass", x = "Vote Pct.") +
-#   ggtitle("Passage and Vote Pct., 110th Congress")+
-#   scale_color_manual(values = c("blue", "red"), labels = c("Republican", "Democrat"))
-#   )
+
+renderImage({
+  outfile <- tempfile(fileext='.gif')
+  
+  all_data<-df %>% select(iso3c, country,date, EN.ATM.CO2E.KT) #%>% filter(date==2000) %>% slice_max(EN.ATM.CO2E.KT, n = 10)
+  
+  top_10 <- all_data %>% 
+    group_by(date) %>% 
+    slice_max(order_by = EN.ATM.CO2E.KT, n=15) %>% 
+    mutate(ranking = rank(-EN.ATM.CO2E.KT)) %>% 
+    ungroup()
+  
+  p <- top_10 %>%
+    ggplot(aes(x = -ranking,y = EN.ATM.CO2E.KT, group = country)) +
+    geom_tile(aes(y = EN.ATM.CO2E.KT / 2, height = EN.ATM.CO2E.KT, fill = country), width = 0.9) +
+    geom_text(aes(label = country), hjust = "right", colour = "black", fontface = "bold", nudge_y = -100000) +
+    geom_text(aes(label = scales::comma(EN.ATM.CO2E.KT)), hjust = "left", nudge_y = 100000, colour = "grey30") +
+    coord_flip(clip="off") +
+    scale_fill_discrete(guide = 'none')+
+    scale_x_discrete("") +
+    scale_y_continuous("",labels=scales::comma) +
+    hrbrthemes::theme_ipsum(plot_title_size = 32, subtitle_size = 24, caption_size = 20, base_size = 20) +
+    theme(panel.grid.major.y=element_blank(),
+          panel.grid.minor.x=element_blank(),
+          #legend.position = c(0.4, 0.2),
+          plot.margin = margin(1,1,1,2,"cm"),
+          axis.text.y=element_blank()) +
+    # gganimate code to transition by year:
+    transition_time(date) +
+    ease_aes('cubic-in-out') +
+    labs(title='World largest polluters',
+         subtitle='Tons of CO2 emissions in {round(frame_time,0)}',
+         caption='Source: World Bank
+  Rocco Incardona / @incardo')
+  
+  animate(p, nframes = 750, fps = 25, end_pause = 50, width = 600, height = 1000)
+  
+  anim_save("outfile.gif", animation = last_animation())
+  
+  # Return a list containing the filename
+  list(src = "outfile.gif",
+       contentType = 'image/gif'
+       # width = 400,
+       # height = 300,
+       # alt = "This is alternate text"
+)}, deleteFile = TRUE)
 
 
 ```
 
-Column
------------------------------------------------------------------------
-
-### Chart C
-
-```{r}
-# dat_view <-dat%>%
-#   drop_na()%>%
-#   filter(congress==110)
-# 
-# ggplotly(ggplot(dat_view, aes(x=dwnom1,y=all_pass,label = thomas_name, color=Party))+
-#   geom_point()+
-#   geom_smooth(method = "lm")+
-#   labs(y="All Pass", x = "DW Nominate.") +
-#   ggtitle("Passage and Ideology, 110th Congress")+
-#   scale_color_manual(values = c("blue", "red"), labels = c("Republican", "Democrat"))
-#   )
-```
 
 Page 3
 ======
