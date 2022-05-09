@@ -26,12 +26,15 @@ economy <- c("NY.GDP.MKTP.PP.CD", "NY.GDP.PCAP.PP.CD", "NE.RSB.GNFS.ZS")
 society <- c("SP.POP.TOTL", "SP.POP.GROW")
 all_indicators <- c(environment,economy,society)
 
+# tic()
+# df <- wb_data(country = "countries_only", indicator = all_indicators, start_date = 1990, end_date = 2020)
+# toc()
+# dim(df)
+# write.csv(df,"capstone_project\\wdi_data.csv", row.names = FALSE)
+
 tic()
-df <- wb_data(country = "countries_only", indicator = all_indicators, start_date = 1990, end_date = 2020)
+df <- read_csv("wdi_data.csv")
 toc()
-dim(df)
-
-
 ```
 
 
@@ -41,7 +44,7 @@ Page 1
 
 Input{.sidebar}
 ----------------------------------------------------------------
-### Chart A
+### Filters
 
 ```{r}
 
@@ -52,7 +55,7 @@ titles_indicators <- c("Total CO2 emissions" = "EN.ATM.CO2E.KT",
 
 selectInput("Indicator", "Indicator", 
             titles_indicators, 
-            multiple = FALSE, selected="SP.POP.TOTL")
+            multiple = FALSE, selected="EN.ATM.CO2E.KT")
 
 sliderInput("dateSel", "Date",
             min = min(df$date, na.rm = TRUE),
@@ -79,14 +82,17 @@ observeEvent(input$Indicator, {
 
 
 ```
-    
+
+
 Column
 ----------------------------------------------------------------
+
+### <b><font face="Roboto" size="5em" color="#000000">Chart 1</font></b> 
 
 ```{r}
 
 g <- list(projection = list(type = 'natural earth'), showland = TRUE, landcolor = toRGB("#e5ecf6")) #orthographic - 'natural earth'
-t <- list(family = "Goergia",  size = 25,  color = "#25476D")
+t <- list(family = "Roboto",  size = 25,  color = "#25476D")
 m <- list(autoexpand = TRUE, l = 25, r = 25, b = 100, t = 100, pad = 0)
 
 renderPlotly({
@@ -120,48 +126,48 @@ Page 2
 Column
 -----------------------------------------------------------------------
 
-
-### Chart B
+### <b><font face="Roboto" size="5em" color="#000000">Chart 2</font></b> 
 
 ```{r}
 
 renderImage({
   outfile <- tempfile(fileext='.gif')
   
-  all_data<-df %>% select(iso3c, country,date, EN.ATM.CO2E.KT) #%>% filter(date==2000) %>% slice_max(EN.ATM.CO2E.KT, n = 10)
-  
-  top_10 <- all_data %>% 
-    group_by(date) %>% 
-    slice_max(order_by = EN.ATM.CO2E.KT, n=15) %>% 
-    mutate(ranking = rank(-EN.ATM.CO2E.KT)) %>% 
-    ungroup()
-  
-  p <- top_10 %>%
-    ggplot(aes(x = -ranking,y = EN.ATM.CO2E.KT, group = country)) +
-    geom_tile(aes(y = EN.ATM.CO2E.KT / 2, height = EN.ATM.CO2E.KT, fill = country), width = 0.9) +
-    geom_text(aes(label = country), hjust = "right", colour = "black", fontface = "bold", nudge_y = -100000) +
-    geom_text(aes(label = scales::comma(EN.ATM.CO2E.KT)), hjust = "left", nudge_y = 100000, colour = "grey30") +
-    coord_flip(clip="off") +
-    scale_fill_discrete(guide = 'none')+
-    scale_x_discrete("") +
-    scale_y_continuous("",labels=scales::comma) +
-    hrbrthemes::theme_ipsum(plot_title_size = 32, subtitle_size = 24, caption_size = 20, base_size = 20) +
-    theme(panel.grid.major.y=element_blank(),
-          panel.grid.minor.x=element_blank(),
-          #legend.position = c(0.4, 0.2),
-          plot.margin = margin(1,1,1,2,"cm"),
-          axis.text.y=element_blank()) +
-    # gganimate code to transition by year:
-    transition_time(date) +
-    ease_aes('cubic-in-out') +
-    labs(title='World largest polluters',
-         subtitle='Tons of CO2 emissions in {round(frame_time,0)}',
-         caption='Source: World Bank
-  Rocco Incardona / @incardo')
-  
-  animate(p, nframes = 750, fps = 25, end_pause = 50, width = 600, height = 1000)
-  
-  anim_save("outfile.gif", animation = last_animation())
+  # all_data<-df %>% select(iso3c, country,date, EN.ATM.CO2E.KT) #%>% filter(date==2000) %>% slice_max(EN.ATM.CO2E.KT, n = 10)
+  # 
+  # top_10 <- all_data %>% 
+  #   group_by(date) %>% 
+  #   slice_max(order_by = EN.ATM.CO2E.KT, n=10) %>% 
+  #   mutate(ranking = rank(-EN.ATM.CO2E.KT)) %>% 
+  #   ungroup()
+  # 
+  # p <- top_10 %>%
+  #   ggplot(aes(x = -ranking,y = EN.ATM.CO2E.KT, group = country)) +
+  #   geom_tile(aes(y = EN.ATM.CO2E.KT / 2, height = EN.ATM.CO2E.KT, fill = country), width = 0.9) +
+  #   scale_fill_brewer(palette = "Paired") +
+  #   geom_text(aes(label = country), hjust = "right", colour = "black", fontface = "bold", nudge_y = -100000) +
+  #   geom_text(aes(label = scales::comma(EN.ATM.CO2E.KT)), hjust = "left", nudge_y = 100000, colour = "grey30") +
+  #   coord_flip(clip="off") +
+  #   scale_fill_discrete(guide = 'none')+
+  #   scale_x_discrete("") +
+  #   scale_y_continuous("",labels=scales::comma) +
+  #   hrbrthemes::theme_ipsum(plot_title_size = 32, subtitle_size = 24, caption_size = 20, base_size = 20) +
+  #   theme(panel.grid.major.y=element_blank(),
+  #         panel.grid.minor.x=element_blank(),
+  #         #legend.position = c(0.4, 0.2),
+  #         plot.margin = margin(1,1,1,2,"cm"),
+  #         axis.text.y=element_blank()) +
+  #   # gganimate code to transition by year:
+  #   transition_time(date) +
+  #   ease_aes('cubic-in-out') +
+  #   labs(title='World largest polluters',
+  #        subtitle='Tons of CO2 emissions in {round(frame_time,0)}',
+  #        caption='Source: World Bank
+  # Rocco Incardona / @incardo')
+  # 
+  # animate(p, nframes = 750, fps = 25, end_pause = 50, width = 1250, height = 750)
+  # 
+  # anim_save("outfile.gif", animation = last_animation())
   
   # Return a list containing the filename
   list(src = "outfile.gif",
@@ -169,7 +175,7 @@ renderImage({
        # width = 400,
        # height = 300,
        # alt = "This is alternate text"
-)}, deleteFile = TRUE)
+)}, deleteFile = FALSE)
 
 
 ```
@@ -180,10 +186,30 @@ Page 3
 
 Input{.sidebar}
 ----------------------------------------------------------------
-### Chart D
+### <b><font face="Roboto" size="5em" color="#000000">Chart 3</font></b> 
 
 ```{r}
 #selectInput("State", "State", dat$st_name, multiple = TRUE, selected=dat$st_name)
+
+selectInput("Indicator1", "Indicator1", 
+            titles_indicators, 
+            multiple = FALSE, selected="EN.ATM.CO2E.KT")
+
+selectInput("Indicator2", "Indicator2", 
+            titles_indicators, 
+            multiple = FALSE, selected="NY.GDP.MKTP.PP.CD")
+
+
+sliderInput("dateSel", "Date",
+            min = min(df$date, na.rm = TRUE),
+            max = max(df$date, na.rm = TRUE),
+            value = min(df$date, na.rm = TRUE),
+            step = 1,
+            timeFormat = "%d %b %y",
+            animate = animationOptions(interval = 500, loop = FALSE),
+            sep = ""
+)
+
 ```
 
 Column
@@ -191,24 +217,57 @@ Column
 
 ```{r}
 
-####hint: this figure uses selectInput with the multiple option set to true and with the options set up so that all states are initially selected.
+renderPlotly({
+  
+    scatter_data <- df %>% select(iso3c, country, date, unname(titles_indicators)) %>% filter(date==input$dateSel)
+    title_name <- paste(names(titles_indicators)[titles_indicators == input$Indicator1], 
+                        names(titles_indicators)[titles_indicators == input$Indicator2],
+                        "in",
+                        input$dateSel, sep = " ")
+    
+    
+    #fv <- scatter_data %>% filter(!is.na(scatter_data[[input$Indicator1]]) & !is.na(scatter_data[[input$Indicator2]])) %>% 
+    #  lm(scatter_data[[input$Indicator1]] ~ scatter_data[[input$Indicator2]],.) %>% fitted.values()
 
 
-# dat_viz <- dat %>% 
-#   group_by(st_name) %>% 
-#   filter(congress==110) %>%
-#   summarise(passed=sum(all_pass))
-# 
-# renderPlot(
-#     ggplot(filter(dat_viz,st_name %in% input$State),aes(y=st_name,x=passed))+
-#     geom_bar(stat='identity') +
-#     labs(y="State Name", x = "Total Bills Passed Per State") +
-#     ggtitle("Total Bills Passed by State Delegations, 110th Congress"), 
-#     height = 750)
+    plot_ly(data = scatter_data, x = log(scatter_data[[input$Indicator1]]), y = log(scatter_data[[input$Indicator2]]),
+            text = ~country) %>% 
+            #hovertemplate = 'Country: %{scatter_data$country}<extra></extra>'
+           #%>% 
+    #add_trace(x = scatter_data[[input$Indicator2]], y = fv, mode = "lines") %>%
+    #layout(showlegend = F)
+    
+    # plot_ly(fig_dat_selected, type='choropleth', 
+    #         locations=fig_dat_selected$iso3c, 
+    #         z = fig_dat_selected[[input$Indicator]], 
+    #         text = fig_dat_selected$country, 
+    #         colorscale = ifelse(input$Indicator == "SP.POP.GROW", "Viridis", "Blues"),
+    #         reversescale = T,
+    #         height = 750,
+    #         zmax = max_legend,
+    #         zmin = min_legend) %>% 
+    #   layout(geo = g, title = title_name , font=t, margin = m, plot_bgcolor = "#e5ecf6") 
+    layout(autosize = F, width = 750, height = 750, margin = m)
+  })
+
 
 ```
 
+```{r}
 
+# library(plotly)
+# 
+# ###PUT YOUR ggplotly() figure here. It will compile in the R Markdown report.
+# 
+# 
+# ggplotly(ggplot(dat3,aes(x=Category,y=Quantity))+
+#   geom_point(aes(frame = Time), color="black")+
+#   geom_segment(aes(x=Category,xend=Category,y=0,yend=Quantity, frame = Time), color="black")+
+#   theme(axis.text.x=element_text(angle=90))+
+#   labs(x="Category",y="Quantity"))
+
+
+```
 
 
 
