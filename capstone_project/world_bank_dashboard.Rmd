@@ -216,22 +216,40 @@ Column
 ----------------------------------------------------------------
 
 ```{r}
+renderText({ 
+    scatter_data_all <- df %>% select(iso3c, country, date, unname(titles_indicators))
+    max_x <- log(max(scatter_data_all[[input$Indicator1]]+100, na.rm = TRUE))
+    min_x <- log(min(scatter_data_all[[input$Indicator1]]+100, na.rm = TRUE))
+    max_y <- log(max(scatter_data_all[[input$Indicator2]]+100, na.rm = TRUE))
+    min_y <- log(min(scatter_data_all[[input$Indicator2]]+100, na.rm = TRUE))
+    print(c(max_x, min_x, max_y, min_y, min(scatter_data_all[[input$Indicator2]], na.rm = TRUE)))})
 
 renderPlotly({
   
     scatter_data <- df %>% select(iso3c, country, date, unname(titles_indicators)) %>% filter(date==input$dateSel)
-    title_name <- paste(names(titles_indicators)[titles_indicators == input$Indicator1], 
+    title_scatter <- paste(names(titles_indicators)[titles_indicators == input$Indicator1], 
                         names(titles_indicators)[titles_indicators == input$Indicator2],
                         "in",
                         input$dateSel, sep = " ")
     
-    
     #fv <- scatter_data %>% filter(!is.na(scatter_data[[input$Indicator1]]) & !is.na(scatter_data[[input$Indicator2]])) %>% 
     #  lm(scatter_data[[input$Indicator1]] ~ scatter_data[[input$Indicator2]],.) %>% fitted.values()
+    
+    scatter_data_all <- df %>% select(iso3c, country, date, unname(titles_indicators))
+    max_x <- log(max(scatter_data_all[[input$Indicator1]]+100, na.rm = TRUE))
+    min_x <- log(min(scatter_data_all[[input$Indicator1]]+100, na.rm = TRUE))
+    max_y <- log(max(scatter_data_all[[input$Indicator2]]+100, na.rm = TRUE))
+    min_y <- log(min(scatter_data_all[[input$Indicator2]]+100, na.rm = TRUE))
 
-
-    plot_ly(data = scatter_data, x = log(scatter_data[[input$Indicator1]]), y = log(scatter_data[[input$Indicator2]]),
+    plot_ly(data = scatter_data, x = log(scatter_data[[input$Indicator1]]+100), y = log(scatter_data[[input$Indicator2]]+100),
             text = ~country) %>% 
+          layout(autosize = F, width = 750, height = 750, margin = m,
+                 xaxis = list(title = paste("Log of ", names(titles_indicators)[titles_indicators == input$Indicator1]),
+                              range = list(min_x+0.1, max_x+0.1)),
+                 yaxis = list(title = paste("Log of ", names(titles_indicators)[titles_indicators == input$Indicator2]),
+                              range = list(min_y+0.1, max_y+0.1)),
+                 title = title_scatter)
+      
             #hovertemplate = 'Country: %{scatter_data$country}<extra></extra>'
            #%>% 
     #add_trace(x = scatter_data[[input$Indicator2]], y = fv, mode = "lines") %>%
@@ -247,7 +265,7 @@ renderPlotly({
     #         zmax = max_legend,
     #         zmin = min_legend) %>% 
     #   layout(geo = g, title = title_name , font=t, margin = m, plot_bgcolor = "#e5ecf6") 
-    layout(autosize = F, width = 750, height = 750, margin = m)
+
   })
 
 
