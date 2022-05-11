@@ -31,6 +31,7 @@ all_indicators <- c(environment,economy,society)
 # toc()
 # dim(df)
 # write.csv(df,"capstone_project\\wdi_data.csv", row.names = FALSE)
+#setwd("capstone_project\\")
 
 tic()
 df <- read_csv("wdi_data.csv")
@@ -71,7 +72,7 @@ sliderInput("dateSel", "Date",
 observeEvent(input$Indicator, {
     df[[input$Indicator]]
   
-    df_range <- df %>% select(iso3c, country,date, as.name(input$Indicator)) %>% filter(!is.na(df[[input$Indicator]]))
+    df_range <- df %>% select(iso2c, iso3c, country,date, as.name(input$Indicator)) %>% filter(!is.na(df[[input$Indicator]]))
     
     updateSliderInput(session, "dateSel", 
                       min = min(df_range$date,na.rm = TRUE),
@@ -186,7 +187,7 @@ Page 3
 
 Input{.sidebar}
 ----------------------------------------------------------------
-### <b><font face="Roboto" size="5em" color="#000000">Chart 3</font></b> 
+### Filters
 
 ```{r}
 #selectInput("State", "State", dat$st_name, multiple = TRUE, selected=dat$st_name)
@@ -200,9 +201,9 @@ selectInput("Indicator2", "Indicator2",
             multiple = FALSE, selected="NY.GDP.MKTP.PP.CD")
 
 
-sliderInput("dateSel", "Date",
-            min = min(df$date, na.rm = TRUE),
-            max = max(df$date, na.rm = TRUE),
+sliderInput("dateSel2", "Date",
+            min = 1990, #min(df$date, na.rm = TRUE),
+            max = 2018, #max(df$date, na.rm = TRUE),
             value = min(df$date, na.rm = TRUE),
             step = 1,
             timeFormat = "%d %b %y",
@@ -214,41 +215,45 @@ sliderInput("dateSel", "Date",
 
 Column
 ----------------------------------------------------------------
+### <b><font face="Roboto" size="5em" color="#000000">Chart 3</font></b> 
 
 ```{r}
-renderText({ 
-    scatter_data_all <- df %>% select(iso3c, country, date, unname(titles_indicators))
-    max_x <- log(max(scatter_data_all[[input$Indicator1]]+100, na.rm = TRUE))
-    min_x <- log(min(scatter_data_all[[input$Indicator1]]+100, na.rm = TRUE))
-    max_y <- log(max(scatter_data_all[[input$Indicator2]]+100, na.rm = TRUE))
-    min_y <- log(min(scatter_data_all[[input$Indicator2]]+100, na.rm = TRUE))
-    print(c(max_x, min_x, max_y, min_y, min(scatter_data_all[[input$Indicator2]], na.rm = TRUE)))})
+# renderText({ 
+#     scatter_data_all <- df %>% select(iso2c, iso3c, country, date, unname(titles_indicators))
+#     max_x <- log(max(scatter_data_all[[input$Indicator1]]+100, na.rm = TRUE))
+#     min_x <- log(min(scatter_data_all[[input$Indicator1]]+100, na.rm = TRUE))
+#     max_y <- log(max(scatter_data_all[[input$Indicator2]]+100, na.rm = TRUE))
+#     min_y <- log(min(scatter_data_all[[input$Indicator2]]+100, na.rm = TRUE))
+#     print(c(max_x, min_x, max_y, min_y, min(scatter_data_all[[input$Indicator2]], na.rm = TRUE)))})
 
 renderPlotly({
   
-    scatter_data <- df %>% select(iso3c, country, date, unname(titles_indicators)) %>% filter(date==input$dateSel)
-    title_scatter <- paste(names(titles_indicators)[titles_indicators == input$Indicator1], 
+    scatter_data <- df %>% select(iso2c, iso3c, country, date, unname(titles_indicators)) %>% filter(date==input$dateSel2)
+    title_scatter <- paste(names(titles_indicators)[titles_indicators == input$Indicator1], " vs ",
                         names(titles_indicators)[titles_indicators == input$Indicator2],
                         "in",
-                        input$dateSel, sep = " ")
+                        input$dateSel2, sep = " ")
     
     #fv <- scatter_data %>% filter(!is.na(scatter_data[[input$Indicator1]]) & !is.na(scatter_data[[input$Indicator2]])) %>% 
     #  lm(scatter_data[[input$Indicator1]] ~ scatter_data[[input$Indicator2]],.) %>% fitted.values()
     
-    scatter_data_all <- df %>% select(iso3c, country, date, unname(titles_indicators))
+    scatter_data_all <- df %>% select(iso2c, country, date, unname(titles_indicators))
     max_x <- log(max(scatter_data_all[[input$Indicator1]]+100, na.rm = TRUE))
     min_x <- log(min(scatter_data_all[[input$Indicator1]]+100, na.rm = TRUE))
     max_y <- log(max(scatter_data_all[[input$Indicator2]]+100, na.rm = TRUE))
     min_y <- log(min(scatter_data_all[[input$Indicator2]]+100, na.rm = TRUE))
+    corr_x <- ifelse(input$Indicator1=="SP.POP.GROW", 0.005, 0.1)
+    corr_y <- ifelse(input$Indicator2=="SP.POP.GROW", 0.005, 0.1)
 
     plot_ly(data = scatter_data, x = log(scatter_data[[input$Indicator1]]+100), y = log(scatter_data[[input$Indicator2]]+100),
             text = ~country) %>% 
-          layout(autosize = F, width = 750, height = 750, margin = m,
+          layout(autosize = F, width = 900, height = 750, margin = m,
                  xaxis = list(title = paste("Log of ", names(titles_indicators)[titles_indicators == input$Indicator1]),
-                              range = list(min_x+0.1, max_x+0.1)),
+                              range = list(min_x-min_x*corr_x, max_x+min_x*corr_x)),
                  yaxis = list(title = paste("Log of ", names(titles_indicators)[titles_indicators == input$Indicator2]),
-                              range = list(min_y+0.1, max_y+0.1)),
-                 title = title_scatter)
+                              range = list(min_y-min_y*corr_y, max_y+min_y*corr_y)),
+                 title = list(text = title_scatter, font=t)) %>%
+          add_text(text=~iso2c, textposition="top center", mode = "markers+text",showlegend = F)
       
             #hovertemplate = 'Country: %{scatter_data$country}<extra></extra>'
            #%>% 
@@ -271,20 +276,72 @@ renderPlotly({
 
 ```
 
+Page 4
+======
+
+Input{.sidebar}
+----------------------------------------------------------------
+### Filters
+
+```{r}
+#selectInput("State", "State", dat$st_name, multiple = TRUE, selected=dat$st_name)
+
+selectInput("country_sel", "Country", 
+            unique(df$country), 
+            multiple = FALSE, selected="Canada")
+
+
+sliderInput("dateSel3", "Date",
+            min = 1990, #min(df$date, na.rm = TRUE),
+            max = 2018, #max(df$date, na.rm = TRUE),
+            value = min(df$date, na.rm = TRUE),
+            step = 1,
+            timeFormat = "%d %b %y",
+            animate = animationOptions(interval = 500, loop = FALSE),
+            sep = ""
+)
+
+```
+
+Row
+-------------------------------------
+    
+### <b><font face="Roboto" size="5em" color="#000000">Chart 4</font></b> 
+    
 ```{r}
 
-# library(plotly)
-# 
-# ###PUT YOUR ggplotly() figure here. It will compile in the R Markdown report.
-# 
-# 
-# ggplotly(ggplot(dat3,aes(x=Category,y=Quantity))+
-#   geom_point(aes(frame = Time), color="black")+
-#   geom_segment(aes(x=Category,xend=Category,y=0,yend=Quantity, frame = Time), color="black")+
-#   theme(axis.text.x=element_text(angle=90))+
-#   labs(x="Category",y="Quantity"))
+renderPlot({df %>% filter(country==input$country_sel) %>% 
+            ggplot(aes(x = date,y = EN.ATM.CO2E.KT))+geom_line()
+          })
 
 
+```
+ 
+### <b><font face="Roboto" size="5em" color="#000000">Chart 5</font></b> 
+    
+```{r}
+renderPlot({df %>% filter(country==input$country_sel) %>% 
+            ggplot(aes(x = date,y = SP.POP.TOTL))+geom_line()
+          })
+``` 
+
+Row
+-------------------------------------
+    
+### <b><font face="Roboto" size="5em" color="#000000">Chart 6</font></b> 
+    
+```{r}
+renderPlot({df %>% filter(country==input$country_sel) %>% 
+            ggplot(aes(x = date,y = NY.GDP.MKTP.PP.CD))+geom_line()
+          })
+```
+    
+### <b><font face="Roboto" size="5em" color="#000000">Chart 7</font></b> 
+
+```{r}
+renderPlot({df %>% filter(country==input$country_sel) %>% 
+            ggplot(aes(x = date,y = SP.POP.GROW))+geom_line()
+          })
 ```
 
 
