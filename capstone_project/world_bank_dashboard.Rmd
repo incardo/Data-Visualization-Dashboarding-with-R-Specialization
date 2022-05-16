@@ -244,16 +244,23 @@ renderPlotly({
     min_y <- log(min(scatter_data_all[[input$Indicator2]]+100, na.rm = TRUE))
     corr_x <- ifelse(input$Indicator1=="SP.POP.GROW", 0.005, 0.1)
     corr_y <- ifelse(input$Indicator2=="SP.POP.GROW", 0.005, 0.1)
+    indicator1_name = names(titles_indicators)[titles_indicators == input$Indicator1]
+    indicator2_name = names(titles_indicators)[titles_indicators == input$Indicator2]
 
-    plot_ly(data = scatter_data, x = log(scatter_data[[input$Indicator1]]+100), y = log(scatter_data[[input$Indicator2]]+100),
+    plot_ly(data = scatter_data, 
+            x = log(scatter_data[[input$Indicator1]]+100), 
+            y = log(scatter_data[[input$Indicator2]]+100),
             text = ~country) %>% 
-          layout(autosize = F, width = 900, height = 750, margin = m,
-                 xaxis = list(title = paste("Log of ", names(titles_indicators)[titles_indicators == input$Indicator1]),
-                              range = list(min_x-min_x*corr_x, max_x+min_x*corr_x)),
-                 yaxis = list(title = paste("Log of ", names(titles_indicators)[titles_indicators == input$Indicator2]),
-                              range = list(min_y-min_y*corr_y, max_y+min_y*corr_y)),
+          layout(autosize = F, width = 900, height = 700, margin = m,
+                 xaxis = list(title = paste("Log of ", indicator1_name),
+                              range = list(min_x-min_x*corr_x, max_x+min_x*corr_x), hoverformat = '.0f'),
+                 yaxis = list(title = paste("Log of ", indicator2_name),
+                              range = list(min_y-min_y*corr_y, max_y+min_y*corr_y), hoverformat = '.0f'),
                  title = list(text = title_scatter, font=t)) %>%
-          add_text(text=~iso2c, textposition="top center", mode = "markers+text",showlegend = F)
+          add_text(text=~iso2c, textposition="top center", mode = "markers+text",showlegend = F) %>% 
+          style(hovertext= paste("Country :", scatter_data$country,
+                                "<br>",indicator1_name," :", round(scatter_data[[input$Indicator1]]),
+                                "<br>",indicator2_name," :", round(scatter_data[[input$Indicator2]])))
       
             #hovertemplate = 'Country: %{scatter_data$country}<extra></extra>'
            #%>% 
@@ -291,15 +298,15 @@ selectInput("country_sel", "Country",
             multiple = FALSE, selected="Canada")
 
 
-sliderInput("dateSel3", "Date",
+sliderInput("dateSel3", "Date Range",
             min = 1990, #min(df$date, na.rm = TRUE),
             max = 2018, #max(df$date, na.rm = TRUE),
-            value = min(df$date, na.rm = TRUE),
+            value = c(1980, 2018),
             step = 1,
             timeFormat = "%d %b %y",
-            animate = animationOptions(interval = 500, loop = FALSE),
+            #animate = animationOptions(interval = 500, loop = FALSE),
             sep = ""
-)
+            )
 
 ```
 
@@ -310,9 +317,16 @@ Row
     
 ```{r}
 
-renderPlot({df %>% filter(country==input$country_sel) %>% 
-            ggplot(aes(x = date,y = EN.ATM.CO2E.KT))+geom_line()
-          })
+renderPlotly({
+  
+  df_country <- df %>%  filter(country==input$country_sel)
+  df %>% filter(country==input$country_sel & date <= input$dateSel3[2] & date >= input$dateSel3[1]) %>%
+            ggplot(aes(x = date,y = EN.ATM.CO2E.KT))+geom_line() +
+            geom_point() +
+            labs(x = "", y = "", 
+                 title=names(titles_indicators)[titles_indicators == "EN.ATM.CO2E.KT"]) +
+    theme_minimal()
+  })
 
 
 ```
@@ -320,9 +334,18 @@ renderPlot({df %>% filter(country==input$country_sel) %>%
 ### <b><font face="Roboto" size="5em" color="#000000">Chart 5</font></b> 
     
 ```{r}
-renderPlot({df %>% filter(country==input$country_sel) %>% 
-            ggplot(aes(x = date,y = SP.POP.TOTL))+geom_line()
-          })
+
+renderPlotly({
+  
+  df_country <- df %>%  filter(country==input$country_sel)
+  df %>% filter(country==input$country_sel & date <= input$dateSel3[2] & date >= input$dateSel3[1]) %>%
+            ggplot(aes(x = date,y = SP.POP.TOTL))+geom_line() +
+            geom_point() +
+            labs(x = "", y = "", 
+                 title=names(titles_indicators)[titles_indicators == "SP.POP.TOTL"]) +
+    theme_minimal()
+  })
+
 ``` 
 
 Row
@@ -331,17 +354,34 @@ Row
 ### <b><font face="Roboto" size="5em" color="#000000">Chart 6</font></b> 
     
 ```{r}
-renderPlot({df %>% filter(country==input$country_sel) %>% 
-            ggplot(aes(x = date,y = NY.GDP.MKTP.PP.CD))+geom_line()
-          })
+
+renderPlotly({
+  
+  df_country <- df %>%  filter(country==input$country_sel)
+  df %>% filter(country==input$country_sel & date <= input$dateSel3[2] & date >= input$dateSel3[1]) %>%
+            ggplot(aes(x = date,y = NY.GDP.MKTP.PP.CD))+geom_line() +
+            geom_point() +
+            labs(x = "", y = "", 
+                 title=names(titles_indicators)[titles_indicators == "NY.GDP.MKTP.PP.CD"]) +
+    theme_minimal()
+  })
+
 ```
     
 ### <b><font face="Roboto" size="5em" color="#000000">Chart 7</font></b> 
 
 ```{r}
-renderPlot({df %>% filter(country==input$country_sel) %>% 
-            ggplot(aes(x = date,y = SP.POP.GROW))+geom_line()
-          })
+
+renderPlotly({
+  
+  df_country <- df %>%  filter(country==input$country_sel)
+  df %>% filter(country==input$country_sel & date <= input$dateSel3[2] & date >= input$dateSel3[1]) %>%
+            ggplot(aes(x = date,y = SP.POP.GROW))+geom_line() +
+            geom_point() +
+            labs(x = "", y = "", 
+                 title=names(titles_indicators)[titles_indicators == "SP.POP.GROW"]) +
+    theme_minimal()
+  })
 ```
 
 
