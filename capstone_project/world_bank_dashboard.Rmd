@@ -228,14 +228,12 @@ Column
 
 renderPlotly({
   
-    scatter_data <- df %>% select(iso2c, iso3c, country, date, unname(titles_indicators)) %>% filter(date==input$dateSel2)
+    scatter_data <- df %>% select(iso2c, iso3c, country, date, unname(titles_indicators)) %>%
+                    filter(date==input$dateSel2)
     title_scatter <- paste(names(titles_indicators)[titles_indicators == input$Indicator1], " vs ",
-                        names(titles_indicators)[titles_indicators == input$Indicator2],
-                        "in",
-                        input$dateSel2, sep = " ")
-    
-    #fv <- scatter_data %>% filter(!is.na(scatter_data[[input$Indicator1]]) & !is.na(scatter_data[[input$Indicator2]])) %>% 
-    #  lm(scatter_data[[input$Indicator1]] ~ scatter_data[[input$Indicator2]],.) %>% fitted.values()
+                           names(titles_indicators)[titles_indicators == input$Indicator2],
+                           "in",
+                           input$dateSel2, sep = " ")
     
     scatter_data_all <- df %>% select(iso2c, country, date, unname(titles_indicators))
     max_x <- log(max(scatter_data_all[[input$Indicator1]]+100, na.rm = TRUE))
@@ -250,35 +248,24 @@ renderPlotly({
     plot_ly(data = scatter_data, 
             x = log(scatter_data[[input$Indicator1]]+100), 
             y = log(scatter_data[[input$Indicator2]]+100),
-            text = ~country) %>% 
-          layout(autosize = F, width = 900, height = 700, margin = m,
-                 xaxis = list(title = paste("Log of ", indicator1_name),
-                              range = list(min_x-min_x*corr_x, max_x+min_x*corr_x), hoverformat = '.0f'),
-                 yaxis = list(title = paste("Log of ", indicator2_name),
-                              range = list(min_y-min_y*corr_y, max_y+min_y*corr_y), hoverformat = '.0f'),
-                 title = list(text = title_scatter, font=t)) %>%
-          add_text(text=~iso2c, textposition="top center", mode = "markers+text",showlegend = F) %>% 
-          style(hovertext= paste("Country :", scatter_data$country,
-                                "<br>",indicator1_name," :", round(scatter_data[[input$Indicator1]]),
-                                "<br>",indicator2_name," :", round(scatter_data[[input$Indicator2]])))
+            hovertext= ~ paste("<br>", "Country :", scatter_data$country,
+                          "<br>",indicator1_name," :", round(scatter_data[[input$Indicator1]]),
+                          "<br>",indicator2_name," :", round(scatter_data[[input$Indicator2]])
+                          ),
+            hoverinfo = "text"
+            ) %>%
       
-            #hovertemplate = 'Country: %{scatter_data$country}<extra></extra>'
-           #%>% 
-    #add_trace(x = scatter_data[[input$Indicator2]], y = fv, mode = "lines") %>%
-    #layout(showlegend = F)
-    
-    # plot_ly(fig_dat_selected, type='choropleth', 
-    #         locations=fig_dat_selected$iso3c, 
-    #         z = fig_dat_selected[[input$Indicator]], 
-    #         text = fig_dat_selected$country, 
-    #         colorscale = ifelse(input$Indicator == "SP.POP.GROW", "Viridis", "Blues"),
-    #         reversescale = T,
-    #         height = 750,
-    #         zmax = max_legend,
-    #         zmin = min_legend) %>% 
-    #   layout(geo = g, title = title_name , font=t, margin = m, plot_bgcolor = "#e5ecf6") 
-
-  })
+    layout(autosize = F, width = 900, height = 700, margin = m,
+           xaxis = list(title = paste("Log of ", indicator1_name),
+                        range = list(min_x-min_x*corr_x, max_x+min_x*corr_x), hoverformat = '.0f'),
+           yaxis = list(title = paste("Log of ", indicator2_name),
+                        range = list(min_y-min_y*corr_y, max_y+min_y*corr_y), hoverformat = '.0f'),
+           title = list(text = title_scatter, font=t)
+           ) %>%
+      
+    add_text(text=~iso2c, textposition="top center", mode = "markers+text",showlegend = F)
+      
+})
 
 
 ```
