@@ -65,7 +65,6 @@ titles_indicators <- c("Total CO2 emissions (Tons)" = "EN.ATM.CO2E.KT",
                          "Population growth (annual %)" = "SP.POP.GROW",
                          "Fertility rate (births per woman)" = "SP.DYN.TFRT.IN",
                          "Energy production & use from oil, gas and coal (% of total)"="EG.ELC.FOSL.ZS"
-                       
                        )    
 
 selectInput("Indicator", "Indicator", 
@@ -394,7 +393,7 @@ selectInput("Indicator3", "Indicator3",
             multiple = FALSE, selected="EN.ATM.CO2E.KT")
 
 
-sliderInput("dateSel3", "Date",
+sliderInput("dateSel4", "Date",
             min = 1990, #min(df$date, na.rm = TRUE),
             max = 2018, #max(df$date, na.rm = TRUE),
             value = min(df$date, na.rm = TRUE),
@@ -404,6 +403,7 @@ sliderInput("dateSel3", "Date",
             sep = ""
 )
 
+
 ```
 
 ## Column
@@ -411,33 +411,39 @@ sliderInput("dateSel3", "Date",
 ### <b><font face="Roboto" size="5em" color="#000000">Chart 8</font></b>
 
 ```{r}
-
 renderPlotly({
   
    boxplot_data <- df %>% select(iso2c, iso3c, country, continent, date,
                                   unname(titles_indicators)) %>%
                            #filter(date==2020 & !is.na(continent))
-                           filter(date==input$dateSel3 & !is.na(continent))
+                           filter((date==input$dateSel4) & (!is.na(continent)))
 
-    title_box <- paste(names(titles_indicators)[titles_indicators == input$Indicator3], "in",
-                           input$dateSel3, sep = " ")
+    title_box <- paste(names(titles_indicators)[titles_indicators == input$Indicator3], 
+                       "in", 
+                       input$dateSel4, 
+                       sep = " ")
+    print(title_box)
     
     box_data_all <- df %>% select(iso2c, iso3c, country, continent, date,
                                   unname(titles_indicators)) %>%
                            filter(!is.na(continent))
+    
     max_y <- log(max(box_data_all[[input$Indicator3]]+100, na.rm = TRUE))
     min_y <- log(min(box_data_all[[input$Indicator3]]+100, na.rm = TRUE))
-    corr_y <- ifelse(input$Indicator2=="SP.POP.GROW", 0.005, 0.1)
+    corr_y <- ifelse(input$Indicator2 %in% c("SP.POP.GROW", "SP.DYN.TFRT.IN"), 0.0005, 0.1)
     indicator3_name = names(titles_indicators)[titles_indicators == input$Indicator3]
-
+    sum_y <- ifelse(input$Indicator2 %in% c("SP.POP.GROW", "SP.DYN.TFRT.IN"), 1, 100)
+       y_var <- log(boxplot_data[[input$Indicator3]]+sum_y)
+       #y_var <- boxplot_data[[input$Indicator3]]
+                    
        p <- ggplot(boxplot_data, aes(x=continent, 
-                                     y=log(boxplot_data[[input$Indicator3]]+100))) + 
+                                     y=y_var)) + 
             geom_boxplot()
        
        ggplotly(p) %>%
        layout(autosize = F, width = 900, height = 650, margin = m,
              yaxis = list(title = paste("Log of ", indicator3_name),
-                          range = list(min_y-min_y*corr_y, max_y+min_y*corr_y), hoverformat = '.0f'),
+                          range = list(min_y-min_y*corr_y, max_y+max_y*corr_y), hoverformat = '.0f'),
              title = list(text = title_box, font=t),
              annotations = list(text = 'Source: World Bank',
                                 font = list(size = 15),
