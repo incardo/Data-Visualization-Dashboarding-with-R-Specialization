@@ -1,10 +1,38 @@
-# Check available data
-#df %>% group_by(date) %>% summarise_all(funs(sum(!is.na(.)))) %>% print(n = Inf)
 
-# df %>% group_by(date) %>% summarise_all(funs(sum(!is.na(.)))) %>%
-#   gather(key="measure", value="value", all_indicators) %>%
-#   ggplot(aes(x = date, y = value)) + geom_bar(stat = "identity") +
-#   facet_wrap(~measure)
+library(flexdashboard)
+library(tidyverse)
+library(plotly)
+library(ggplot2)
+library(shiny)
+
+library(tictoc)
+library(wbstats)
+library(gganimate)
+
+
+environment <- c("EN.POP.DNST", "EN.ATM.CO2E.KT", "EN.ATM.GHGT.KT.CE", "EG.ELC.FOSL.ZS")
+economy <- c("NY.GDP.MKTP.PP.CD", "NY.GDP.PCAP.PP.CD", "NE.RSB.GNFS.ZS")
+society <- c("SP.POP.TOTL", "SP.POP.GROW", "SP.DYN.TFRT.IN")
+all_indicators <- c(environment,economy,society)
+
+tic()
+df <- wb_data(country = "all", indicator = all_indicators, start_date = 1990, end_date = 2020)
+toc()
+dim(df)
+
+library(countrycode)
+
+df$continent <- countrycode(sourcevar = df[["country"]],
+            origin = "country.name",
+            destination = "continent")
+
+# Check available data
+df %>% group_by(date) %>% summarise_all(funs(sum(!is.na(.)))) %>% print(n = Inf)
+
+df %>% group_by(date) %>% summarise_all(funs(sum(!is.na(.)))) %>%
+  gather(key="measure", value="value", all_indicators) %>%
+  ggplot(aes(x = date, y = value)) + geom_bar(stat = "identity") +
+  facet_wrap(~measure)
 # 
 # summary(df)
 # indicator <- "EG.ELC.FOSL.ZS"
@@ -22,27 +50,6 @@
 # })
 
 
-library(flexdashboard)
-library(tidyverse)
-library(plotly)
-library(ggplot2)
-library(shiny)
-
-library(tictoc)
-#library(WDI)
-library(wbstats)
-library(gganimate)
-
-
-environment <- c("EN.POP.DNST", "EN.ATM.CO2E.KT", "EN.ATM.GHGT.KT.CE", "EG.ELC.FOSL.ZS")
-economy <- c("NY.GDP.MKTP.PP.CD", "NY.GDP.PCAP.PP.CD", "NE.RSB.GNFS.ZS")
-society <- c("SP.POP.TOTL", "SP.POP.GROW")
-all_indicators <- c(environment,economy,society)
-
-tic()
-df <- wb_data(country = "countries_only", indicator = all_indicators, start_date = 1990, end_date = 2020)
-toc()
-dim(df)
 
 all_data<-df %>% select(iso3c, country,date, EN.ATM.CO2E.KT) #%>% filter(date==2000) %>% slice_max(EN.ATM.CO2E.KT, n = 10)
 
